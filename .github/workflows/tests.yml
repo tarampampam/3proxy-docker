@@ -22,31 +22,64 @@ jobs: # Docs: <https://git.io/JvxXE>
         run: docker build -f ./Dockerfile --tag image:local .
 
       - name: Run docker image with default settings
-        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" image:local
+        run: |
+          docker run --rm -d \
+            -p "3128:3128/tcp" \
+            -p "1080:1080/tcp" \
+            image:local
 
       - name: Pause
         run: sleep 2
 
       - name: Try to use HTTP proxy
-        run: curl -v --fail --proxy http://127.0.0.1:3128 --connect-timeout 3 --max-time 3 https://github.com/robots.txt
+        run: |
+          curl -v --fail \
+            --proxy http://127.0.0.1:3128 \
+            --connect-timeout 3 \
+            --max-time 3 \
+            https://github.com/robots.txt
 
       - name: Try to use SOCKS proxy
-        run: curl -v --fail --proxy socks5://127.0.0.1:1080 --connect-timeout 3 --max-time 3 https://github.com/robots.txt
+        run: |
+          curl -v --fail \
+            --proxy socks5://127.0.0.1:1080 \
+            --connect-timeout 3 \
+            --max-time 3 \
+            https://github.com/robots.txt
 
       - name: Stop container
         run: docker stop $(docker ps -a --filter ancestor=image:local -q)
 
       - name: Run docker image with auth settings
-        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" -e "AUTH_REQUIRED=true" -e "PROXY_LOGIN=evil" -e "PROXY_PASSWORD=live" image:local
+        run: |
+          docker run --rm -d \
+            -p "3128:3128/tcp" \
+            -p "1080:1080/tcp" \
+            -e "AUTH_REQUIRED=true" \
+            -e "PROXY_LOGIN=evil" \
+            -e "PROXY_PASSWORD=live" \
+            image:local
 
       - name: Pause
         run: sleep 2
 
       - name: Try to use HTTP proxy
-        run: curl -v --fail --proxy http://127.0.0.1:3128 --proxy-user evil:live --connect-timeout 3 --max-time 3 https://github.com/robots.txt
+        run: |
+          curl -v --fail \
+            --proxy http://127.0.0.1:3128 \
+            --proxy-user evil:live \
+            --connect-timeout 3 \
+            --max-time 3 \
+            https://github.com/robots.txt
 
       - name: Try to use SOCKS proxy
-        run: curl -v --fail --proxy socks5://127.0.0.1:1080 --proxy-user evil:live --connect-timeout 3 --max-time 3 https://github.com/robots.txt
+        run: |
+          curl -v --fail \
+            --proxy socks5://127.0.0.1:1080 \
+            --proxy-user evil:live \
+            --connect-timeout 3 \
+            --max-time 3 \
+            https://github.com/robots.txt
 
       - name: Stop container
         run: docker stop $(docker ps -a --filter ancestor=image:local -q)

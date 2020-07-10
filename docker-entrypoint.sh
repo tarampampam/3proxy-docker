@@ -38,9 +38,6 @@ nscache 65536
 # Here we can change timeout values
 timeouts 1 5 30 60 180 1800 15 60
 
-# Include passwd file. For included files <CR> and <LF> are treated as field separators
-users $/etc/3proxy/passwd
-
 log /dev/stdout
 logformat "- +_L%t.%.  %N.%p %E %U %C:%c %R:%r %O %I %h %T"
 
@@ -57,7 +54,7 @@ EOF
 if [ "$AUTH_REQUIRED" = "true" ]; then
   echo "$0: setup auth settings in configuration file";
 
-  sed -i "s~#AUTH_SETTINGS~auth strong\nallow ${PROXY_LOGIN}~" /etc/3proxy/3proxy.cfg
+  sed -i "s~#AUTH_SETTINGS~users \$/etc/3proxy/passwd\nauth strong\nallow ${PROXY_LOGIN}~" /etc/3proxy/3proxy.cfg
 fi;
 
 exec "$@"
