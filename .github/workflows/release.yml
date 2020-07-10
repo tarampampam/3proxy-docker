@@ -1,0 +1,28 @@
+name: release
+
+on:
+  release: # Docs: <https://git.io/JeBz1#release-event-release>
+    types: [published]
+
+jobs:
+  docker-image:
+    name: Build docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Generate image tag value
+        run: echo "::set-env name=IMAGE_TAG::${GITHUB_REF##*/[vV]}" # `/refs/tags/v1.2.3` -> `1.2.3`
+
+      - name: Make docker login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_LOGIN }}" --password-stdin &> /dev/null
+
+      - name: Build image
+        run: docker build --tag "tarampampam/3proxy:${IMAGE_TAG}" --tag "tarampampam/3proxy:latest" -f ./Dockerfile .
+
+      - name: Push version image
+        run: docker push "tarampampam/3proxy:${IMAGE_TAG}"
+
+      - name: Push latest image
+        run: docker push "tarampampam/3proxy:latest"
