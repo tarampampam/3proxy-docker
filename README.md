@@ -43,8 +43,8 @@ For example:
 
 ```bash
 $ docker run --rm -d \
-    -p "3128:3128/tcp" \ # http proxy
-    -p "1080:1080/tcp" \ # socks proxy
+    -p "3128:3128/tcp" \
+    -p "1080:1080/tcp" \
     tarampampam/3proxy:latest
 ```
 
@@ -52,8 +52,8 @@ Or with auth settings:
 
 ```bash
 $ docker run --rm -d \
-    -p "3128:3128/tcp" \ # http proxy
-    -p "1080:1080/tcp" \ # socks proxy
+    -p "3128:3128/tcp" \
+    -p "1080:1080/tcp" \
     -e "AUTH_REQUIRED=true" \
     -e "PROXY_LOGIN=evil" \
     -e "PROXY_PASSWORD=live" \
