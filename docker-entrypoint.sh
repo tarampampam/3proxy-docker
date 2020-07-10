@@ -57,4 +57,6 @@ if [ "$AUTH_REQUIRED" = "true" ]; then
   sed -i "s~#AUTH_SETTINGS~users \$/etc/3proxy/passwd\nauth strong\nallow ${PROXY_LOGIN}~" /etc/3proxy/3proxy.cfg
 fi;
 
+cat /etc/3proxy/3proxy.cfg
+
 exec "$@"

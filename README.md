@@ -16,6 +16,13 @@
 
 > Page on `hub.docker.com` can be [found here][link_docker_hub].
 
+TCP ports:
+
+Port number | Description
+----------- | -----------
+`3128`      | [HTTP proxy](https://3proxy.org/doc/man8/proxy.8.html)
+`1080`      | [SOCKS proxy](https://3proxy.org/doc/man8/socks.8.html)
+
 ## Supported tags
 
 [![image stats](https://dockeri.co/image/tarampampam/3proxy)][link_docker_tags]
@@ -36,8 +43,8 @@ For example:
 
 ```bash
 $ docker run --rm -d \
-    -p "3128:3128/tcp" \
-    -p "1080:1080/tcp" \
+    -p "3128:3128/tcp" \ # http proxy
+    -p "1080:1080/tcp" \ # socks proxy
     tarampampam/3proxy:latest
 ```
 
@@ -45,11 +52,11 @@ Or with auth settings:
 
 ```bash
 $ docker run --rm -d \
+    -p "3128:3128/tcp" \ # http proxy
+    -p "1080:1080/tcp" \ # socks proxy
     -e "AUTH_REQUIRED=true" \
     -e "PROXY_LOGIN=evil" \
     -e "PROXY_PASSWORD=live" \
-    -p "3128:3128/tcp" \
-    -p "1080:1080/tcp" \
     tarampampam/3proxy:latest
 ```
 
