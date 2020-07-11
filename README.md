@@ -92,7 +92,7 @@ WTFPL. Use anywhere for your pleasure.
 [link_changes_log]:https://github.com/tarampampam/3proxy-docker/blob/master/CHANGELOG.md
 [link_issues]:https://github.com/tarampampam/3proxy-docker/issues
 [link_pulls]:https://github.com/tarampampam/3proxy-docker/pulls
-[link_build_status]:https://travis-ci.org/tarampampam/3proxy-docker
+[link_build_status]:https://github.com/tarampampam/3proxy-docker/actions
 [link_create_issue]:https://github.com/tarampampam/3proxy-docker/issues/new
 [link_license]:https://github.com/tarampampam/3proxy-docker/blob/master/LICENSE
 [link_docker_tags]:https://hub.docker.com/r/tarampampam/3proxy/tags
