@@ -19,7 +19,12 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_LOGIN }}" --password-stdin &> /dev/null
 
       - name: Build image
-        run: docker build --tag "tarampampam/3proxy:${IMAGE_TAG}" --tag "tarampampam/3proxy:latest" -f ./Dockerfile .
+        run: |
+          docker build \
+            --build-arg "BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'`" \
+            --tag "tarampampam/3proxy:${IMAGE_TAG}" \
+            --tag "tarampampam/3proxy:latest" \
+            -f ./Dockerfile .
 
       - name: Push version image
         run: docker push "tarampampam/3proxy:${IMAGE_TAG}"

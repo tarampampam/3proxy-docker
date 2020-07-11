@@ -12,7 +12,7 @@
 
 ## Why this image created?
 
-3proxy is awesome and lightweight proxy-server. This image contains stable version with it and can be configured using environment variables.
+3proxy is awesome and lightweight proxy-server. This image contains stable version with it and can be configured using environment variables. By default, it uses anonymous (hide information about client) proxy settings.
 
 > Page on `hub.docker.com` can be [found here][link_docker_hub].
 
@@ -79,7 +79,7 @@ If you will find any package errors, please, [make an issue][link_create_issue] 
 WTFPL. Use anywhere for your pleasure.
 
 [badge_build_status]:https://img.shields.io/github/workflow/status/tarampampam/3proxy-docker/tests/master?logo=github&label=build
-[badge_release_status]:https://img.shields.io/github/workflow/status/tarampampam/3proxy-docker/release/master?logo=github&label=release
+[badge_release_status]:https://img.shields.io/github/workflow/status/tarampampam/3proxy-docker/release?logo=github&label=release
 [badge_release_date]:https://img.shields.io/github/release-date/tarampampam/3proxy-docker.svg?style=flat-square&maxAge=180
 [badge_commits_since_release]:https://img.shields.io/github/commits-since/tarampampam/3proxy-docker/latest.svg?style=flat-square&maxAge=180
 [badge_issues]:https://img.shields.io/github/issues/tarampampam/3proxy-docker.svg?style=flat-square&maxAge=180
