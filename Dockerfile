@@ -12,6 +12,11 @@ RUN set -x \
     && git clone --branch ${VERSION} https://github.com/z3APA3A/3proxy.git /tmp/3proxy \
     && cd /tmp/3proxy \
     && echo '#define ANONYMOUS 1' >> /tmp/3proxy/src/3proxy.h \
+    && sed -i 's~\(<\/head>\)~<style>html,body{background-color:#222526;color:#fff;font-family:sans-serif;\
+text-align:center;display:flex;flex-direction:column;justify-content:center}h1,h2{margin-bottom:0;font-size:2.5em}\
+h2::before{content:'"'"'Proxy error'"'"';display:block;font-size:0.4em;color:#bbb;font-weight:100}\
+h3,p{color:#bbb}</style>\1~' /tmp/3proxy/src/proxy.c \
+    && cat ./src/proxy.c | grep '</head>' \
     && make -f Makefile.Linux
 
 FROM alpine:latest

@@ -55,7 +55,6 @@ jobs: # Docs: <https://git.io/JvxXE>
           docker run --rm -d \
             -p "3128:3128/tcp" \
             -p "1080:1080/tcp" \
-            -e "AUTH_REQUIRED=true" \
             -e "PROXY_LOGIN=evil" \
             -e "PROXY_PASSWORD=live" \
             image:local

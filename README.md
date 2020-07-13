@@ -12,7 +12,7 @@
 
 ## Why this image created?
 
-3proxy is awesome and lightweight proxy-server. This image contains stable version with it and can be configured using environment variables. By default, it uses anonymous (hide information about client) proxy settings.
+3proxy is awesome and lightweight proxy-server. This image contains stable version with it and can be configured using environment variables. By default, it uses anonymous (information about client hiding) proxy settings.
 
 > Page on `hub.docker.com` can be [found here][link_docker_hub].
 
@@ -33,7 +33,6 @@ All supported image tags [can be found here][link_docker_tags].
 
 Variable name    | Description                               | Example
 ---------------- | ----------------------------------------- | ---------------
-`AUTH_REQUIRED`  | Require authorization? (default: `false`) | `true`, `false`
 `PROXY_LOGIN`    | Authorization login                       | `username`
 `PROXY_PASSWORD` | Authorization password                    | `password`
 
@@ -54,7 +53,6 @@ Or with auth settings:
 $ docker run --rm -d \
     -p "3128:3128/tcp" \
     -p "1080:1080/tcp" \
-    -e "AUTH_REQUIRED=true" \
     -e "PROXY_LOGIN=evil" \
     -e "PROXY_PASSWORD=live" \
     tarampampam/3proxy:latest
