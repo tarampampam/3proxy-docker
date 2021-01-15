@@ -11,27 +11,63 @@ on:
     - cron: '0 0 * * 0' # once in a week, docs: <https://git.io/JvxXE#onschedule>
 
 jobs: # Docs: <https://git.io/JvxXE>
-  docker-image:
-    name: Build and use docker image
-    runs-on: ubuntu-latest
+  build-image:
+    name: Build docker image
+    runs-on: ubuntu-20.04
     steps:
       - name: Check out code
         uses: actions/checkout@v2
 
       - name: Build docker image
-        run: docker build -f ./Dockerfile --tag image:local .
+        run: docker build -f ./Dockerfile --tag 3proxy:local .
 
-      - name: Run docker image with default settings
-        run: |
-          docker run --rm -d \
-            -p "3128:3128/tcp" \
-            -p "1080:1080/tcp" \
-            image:local
+      - name: Scan image
+        uses: anchore/scan-action@v2 # action page: <https://github.com/anchore/scan-action>
+        with:
+          image: 3proxy:local
+          fail-build: true
+          severity-cutoff: low # negligible, low, medium, high or critical
+
+      - name: Save docker image
+        run: docker save 3proxy:local > ./docker-image.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-image
+          path: ./docker-image.tar
+
+  test-http:
+    name: Build and use docker image (auth ${{ matrix.auth }})
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        auth: [yes, no]
+    steps:
+      - name: Download builded docker image
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-image
+          path: .artifact
+
+      - name: Prepare image to run
+        working-directory: .artifact
+        run: docker load < docker-image.tar
+
+      - name: Start server without auth setup
+        if: matrix.auth != 'yes'
+        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" 3proxy:local
+
+      - name: Start server with auth setup
+        if: matrix.auth == 'yes'
+        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" -e "PROXY_LOGIN=evil" -e "PROXY_PASSWORD=live" 3proxy:local
 
       - name: Pause
-        run: sleep 2
+        run: sleep 1
 
       - name: Try to use HTTP proxy
+        if: matrix.auth != 'yes'
         run: |
           curl -v --fail \
             --proxy http://127.0.0.1:3128 \
@@ -40,6 +76,7 @@ jobs: # Docs: <https://git.io/JvxXE>
             https://github.com/robots.txt
 
       - name: Try to use SOCKS proxy
+        if: matrix.auth != 'yes'
         run: |
           curl -v --fail \
             --proxy socks5://127.0.0.1:1080 \
@@ -47,22 +84,8 @@ jobs: # Docs: <https://git.io/JvxXE>
             --max-time 3 \
             https://github.com/robots.txt
 
-      - name: Stop container
-        run: docker stop $(docker ps -a --filter ancestor=image:local -q)
-
-      - name: Run docker image with auth settings
-        run: |
-          docker run --rm -d \
-            -p "3128:3128/tcp" \
-            -p "1080:1080/tcp" \
-            -e "PROXY_LOGIN=evil" \
-            -e "PROXY_PASSWORD=live" \
-            image:local
-
-      - name: Pause
-        run: sleep 2
-
-      - name: Try to use HTTP proxy
+      - name: Try to use HTTP proxy (with auth)
+        if: matrix.auth == 'yes'
         run: |
           curl -v --fail \
             --proxy http://127.0.0.1:3128 \
@@ -71,7 +94,8 @@ jobs: # Docs: <https://git.io/JvxXE>
             --max-time 3 \
             https://github.com/robots.txt
 
-      - name: Try to use SOCKS proxy
+      - name: Try to use SOCKS proxy (with auth)
+        if: matrix.auth == 'yes'
         run: |
           curl -v --fail \
             --proxy socks5://127.0.0.1:1080 \
@@ -81,4 +105,4 @@ jobs: # Docs: <https://git.io/JvxXE>
             https://github.com/robots.txt
 
       - name: Stop container
-        run: docker stop $(docker ps -a --filter ancestor=image:local -q)
+        run: docker stop $(docker ps -a --filter ancestor=3proxy:local -q)

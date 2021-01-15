@@ -12,21 +12,27 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Generate image tag value
-        run: echo "::set-env name=IMAGE_TAG::${GITHUB_REF##*/[vV]}" # `/refs/tags/v1.2.3` -> `1.2.3`
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1 # Action page: <https://github.com/docker/setup-buildx-action>
+        id: buildx
 
-      - name: Make docker login
+      - name: Docker login in default registry
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_LOGIN }}" --password-stdin &> /dev/null
+
+      - name: Docker login in ghcr.io # Auth docs: <https://git.io/JLDaw>
+        run: echo "${{ secrets.GHCR_PASSWORD }}" | docker login ghcr.io -u tarampampam --password-stdin
+
+      - name: Generate image tag value
+        id: tag
+        run: echo "::set-output name=value::`echo ${GITHUB_REF##*/} | sed -e 's/^[vV ]*//'`" # `/refs/tags/v1.2.3` -> `1.2.3`
 
       - name: Build image
         run: |
-          docker build \
-            --tag "tarampampam/3proxy:${IMAGE_TAG}" \
+          docker buildx build \
+            --platform ${{ steps.buildx.outputs.platforms }} \
+            --tag "tarampampam/3proxy:${{ steps.tag.outputs.value }} \
             --tag "tarampampam/3proxy:latest" \
-            -f ./Dockerfile .
-
-      - name: Push version image
-        run: docker push "tarampampam/3proxy:${IMAGE_TAG}"
-
-      - name: Push latest image
-        run: docker push "tarampampam/3proxy:latest"
+            --tag "ghcr.io/tarampampam/3proxy:${{ steps.tag.outputs.value }}" \
+            --tag "ghcr.io/tarampampam/3proxy:latest" \
+            --push \
+            .

@@ -58,7 +58,8 @@ RUN set -x \
     && chmod -R 550 /usr/local/3proxy \
     && chmod -R 555 /usr/local/3proxy/libexec \
     && chown -R root /usr/local/3proxy/libexec \
-    && mkdir /etc/3proxy
+    && mkdir /etc/3proxy \
+    && chown -R 10001:10001 /etc/3proxy
 
 # Copy our config and entrypoint script
 COPY 3proxy.cfg /etc/3proxy/3proxy.cfg
