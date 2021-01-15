@@ -58,6 +58,14 @@ $ docker run --rm -d \
     tarampampam/3proxy:latest
 ```
 
+## Releasing
+
+New versions publishing is very simple - just make required changes in this repository, update [changelog file](CHANGELOG.md) and "publish" new release using repo releases page.
+
+Docker images will be build and published automatically.
+
+> New release will overwrite the `latest` docker image tag in both registers.
+
 ## Changes log
 
 [![Release date][badge_release_date]][link_releases]
