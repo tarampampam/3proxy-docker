@@ -1,5 +1,5 @@
 # Image page: <https://hub.docker.com/_/alpine>
-FROM gcc:9.3 as builder
+FROM gcc:10.2.0 as builder
 
 # e.g.: `docker build --build-arg "VERSION=0.9.3" .`
 ARG VERSION="0.9.3"
