@@ -37,13 +37,14 @@ jobs: # Docs: <https://git.io/JvxXE>
           name: docker-image
           path: ./docker-image.tar
 
-  test-http:
+  try-to-use:
     name: Build and use docker image (auth ${{ matrix.auth }})
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
         auth: [yes, no]
+    needs: [build-image]
     steps:
       - name: Download builded docker image
         uses: actions/download-artifact@v2
