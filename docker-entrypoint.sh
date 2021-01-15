@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 set -e
 
 PROXY_LOGIN=${PROXY_LOGIN:-} # string

@@ -21,7 +21,6 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            --build-arg "BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'`" \
             --tag "tarampampam/3proxy:${IMAGE_TAG}" \
             --tag "tarampampam/3proxy:latest" \
             -f ./Dockerfile .
