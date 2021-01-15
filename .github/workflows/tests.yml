@@ -65,7 +65,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" -e "PROXY_LOGIN=evil" -e "PROXY_PASSWORD=live" 3proxy:local
 
       - name: Pause
-        run: sleep 1
+        run: sleep 3
 
       - name: Try to use HTTP proxy
         if: matrix.auth != 'yes'
