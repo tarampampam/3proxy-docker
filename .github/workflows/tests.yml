@@ -74,7 +74,7 @@ jobs: # Docs: <https://git.io/JvxXE>
             --proxy http://127.0.0.1:3128 \
             --connect-timeout 3 \
             --max-time 3 \
-            https://github.com/robots.txt
+            https://www.cloudflare.com/robots.txt
 
       - name: Try to use SOCKS proxy
         if: matrix.auth != 'yes'
@@ -83,7 +83,7 @@ jobs: # Docs: <https://git.io/JvxXE>
             --proxy socks5://127.0.0.1:1080 \
             --connect-timeout 3 \
             --max-time 3 \
-            https://github.com/robots.txt
+            https://www.cloudflare.com/robots.txt
 
       - name: Try to use HTTP proxy (with auth)
         if: matrix.auth == 'yes'
@@ -93,7 +93,7 @@ jobs: # Docs: <https://git.io/JvxXE>
             --proxy-user evil:live \
             --connect-timeout 3 \
             --max-time 3 \
-            https://github.com/robots.txt
+            https://www.cloudflare.com/robots.txt
 
       - name: Try to use SOCKS proxy (with auth)
         if: matrix.auth == 'yes'
@@ -103,7 +103,7 @@ jobs: # Docs: <https://git.io/JvxXE>
             --proxy-user evil:live \
             --connect-timeout 3 \
             --max-time 3 \
-            https://github.com/robots.txt
+            https://www.cloudflare.com/robots.txt
 
       - name: Stop container
         run: docker stop $(docker ps -a --filter ancestor=3proxy:local -q)
