@@ -32,7 +32,7 @@ jobs:
             -f ./Dockerfile .
 
       - name: Push into default registry
-        run: docker push "tarampampam/3proxy:${IMAGE_TAG}" && docker push "tarampampam/3proxy:latest"
+        run: docker push "tarampampam/3proxy:${{ steps.tag.outputs.value }}" && docker push "tarampampam/3proxy:latest"
 
       - name: Push into ghcr.io
-        run: docker push "ghcr.io/tarampampam/3proxy:${IMAGE_TAG}" && docker push "ghcr.io/tarampampam/3proxy:latest"
+        run: docker push "ghcr.io/tarampampam/3proxy:${{ steps.tag.outputs.value }}" && docker push "ghcr.io/tarampampam/3proxy:latest"
