@@ -1,0 +1,21 @@
+docs:
+  - '**/*.md'
+  - '**/*.MD'
+
+.github:
+  - '.github/**/*'
+
+CI:
+  - '.github/workflows/**/*'
+  - '.github/actions/**/*'
+
+docker:
+  - 'Dockerfile'
+  - 'docker/**/*'
+  - '.dockerignore'
+  - 'docker-entrypoint.sh'
+  - '3proxy.cfg'
+
+dev:
+  - '.gitignore'
+  - '.editorconfig'
