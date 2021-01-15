@@ -7,7 +7,7 @@ on:
 jobs:
   docker-image:
     name: Build docker image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
         run: |
           docker buildx build \
             --platform ${{ steps.buildx.outputs.platforms }} \
-            --tag "tarampampam/3proxy:${{ steps.tag.outputs.value }} \
+            --tag "tarampampam/3proxy:${{ steps.tag.outputs.value }}" \
             --tag "tarampampam/3proxy:latest" \
             --tag "ghcr.io/tarampampam/3proxy:${{ steps.tag.outputs.value }}" \
             --tag "ghcr.io/tarampampam/3proxy:latest" \
