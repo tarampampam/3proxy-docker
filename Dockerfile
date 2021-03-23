@@ -1,5 +1,7 @@
+# syntax=docker/dockerfile:1.2
+
 # Image page: <https://hub.docker.com/_/gcc>
-FROM gcc:10.2.0 as builder
+FROM --platform=${TARGETPLATFORM:-linux/amd64} gcc:10.2.0 as builder
 
 # e.g.: `docker build --build-arg "VERSION=0.9.3" .`
 ARG VERSION="0.9.3"
@@ -34,7 +36,7 @@ RUN set -x \
     && strip ./bin/SSLPlugin.ld.so
 
 # Prepare filesystem for 3proxy running
-FROM busybox:1.32-glibc as buffer
+FROM --platform=${TARGETPLATFORM:-linux/amd64} busybox:1.32-glibc as buffer
 
 # Copy binaries
 COPY --from=builder /lib/x86_64-linux-gnu/libdl.so.* /lib/

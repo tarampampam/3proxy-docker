@@ -12,6 +12,12 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1 # Action page: <https://github.com/docker/setup-qemu-action>
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1 # Action page: <https://github.com/docker/setup-buildx-action>
+
       - name: Docker login in default registry
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_LOGIN }}" --password-stdin &> /dev/null
 
@@ -24,15 +30,12 @@ jobs:
 
       - name: Build image
         run: |
-          docker build \
+          docker buildx build \
+            --platform "linux/amd64,linux/arm/v7" \
             --tag "tarampampam/3proxy:${{ steps.tag.outputs.value }}" \
             --tag "tarampampam/3proxy:latest" \
             --tag "ghcr.io/tarampampam/3proxy:${{ steps.tag.outputs.value }}" \
             --tag "ghcr.io/tarampampam/3proxy:latest" \
-            -f ./Dockerfile .
-
-      - name: Push into default registry
-        run: docker push "tarampampam/3proxy:${{ steps.tag.outputs.value }}" && docker push "tarampampam/3proxy:latest"
-
-      - name: Push into ghcr.io
-        run: docker push "ghcr.io/tarampampam/3proxy:${{ steps.tag.outputs.value }}" && docker push "ghcr.io/tarampampam/3proxy:latest"
+            --file ./Dockerfile \
+            --push \
+            .
