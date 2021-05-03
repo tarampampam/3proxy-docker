@@ -12,7 +12,7 @@
 
 ## Why this image created?
 
-3proxy is awesome and lightweight proxy-server. This image contains stable version with it and can be configured using environment variables. By default, it uses anonymous (information about client hiding) proxy settings.
+3proxy is awesome and lightweight proxy-server. This image contains stable version with it and can be configured using environment variables. By default, it uses anonymous (information about client hiding) proxy settings. Logging in JSON format.
 
 > Page on `hub.docker.com` can be [found here][link_docker_hub].
 
