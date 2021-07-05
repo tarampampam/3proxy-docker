@@ -4,6 +4,12 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v1.4.0
+
+### Changed
+
+- 3proxy updated from `0.9.3` up to `0.9.4`
+
 ## v1.3.0
 
 ### Changed
