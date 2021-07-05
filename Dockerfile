@@ -1,8 +1,8 @@
 # Image page: <https://hub.docker.com/_/gcc>
 FROM gcc:11.1.0 as builder
 
-# e.g.: `docker build --build-arg "VERSION=0.9.3" .`
-ARG VERSION="0.9.3"
+# e.g.: `docker build --build-arg "VERSION=0.9.4" .`
+ARG VERSION="0.9.4"
 
 # Fetch 3proxy sources
 RUN set -x \
