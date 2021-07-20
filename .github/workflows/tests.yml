@@ -34,6 +34,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         with:
           name: docker-image
           path: ./docker-image.tar
+          retention-days: 1
 
   try-to-use:
     name: Build and use docker image (auth ${{ matrix.auth }})

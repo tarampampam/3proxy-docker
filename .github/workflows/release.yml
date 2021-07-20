@@ -12,11 +12,18 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Docker login in default registry
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_LOGIN }}" --password-stdin &> /dev/null
+      - name: Login to default Container Registry
+        uses: docker/login-action@v1 # Action page: <https://github.com/docker/login-action>
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Docker login in ghcr.io # Auth docs: <https://git.io/JLDaw>
-        run: echo "${{ secrets.GHCR_PASSWORD }}" | docker login ghcr.io -u tarampampam --password-stdin
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 # Action page: <https://github.com/docker/login-action>
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PASSWORD }}
 
       - name: Generate image tag value
         id: tag
@@ -27,8 +34,8 @@ jobs:
           docker build \
             --tag "tarampampam/3proxy:${{ steps.tag.outputs.value }}" \
             --tag "tarampampam/3proxy:latest" \
-            --tag "ghcr.io/tarampampam/3proxy:${{ steps.tag.outputs.value }}" \
-            --tag "ghcr.io/tarampampam/3proxy:latest" \
+            --tag "ghcr.io/${{ github.actor }}/3proxy:${{ steps.tag.outputs.value }}" \
+            --tag "ghcr.io/${{ github.actor }}/3proxy:latest" \
             -f ./Dockerfile .
 
       - name: Push into default registry
