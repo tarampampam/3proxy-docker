@@ -34,7 +34,7 @@ RUN set -x \
     && strip ./bin/SSLPlugin.ld.so
 
 # Prepare filesystem for 3proxy running
-FROM busybox:1.33.1-glibc as buffer
+FROM busybox:1.34.0-glibc as buffer
 
 # Copy binaries
 COPY --from=builder /lib/x86_64-linux-gnu/libdl.so.* /lib/
