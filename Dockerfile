@@ -36,37 +36,27 @@ RUN set -x \
 # Prepare filesystem for 3proxy running
 FROM busybox:1.34.0-glibc as buffer
 
+# create a directory for the future root filesystem
+WORKDIR /tmp/rootfs
+
+# prepare the root filesystem
+RUN set -x \
+    && mkdir -p ./etc ./bin ./usr/local/3proxy/libexec ./etc/3proxy \
+    && echo '3proxy:x:10001:10001::/nonexistent:/sbin/nologin' > ./etc/passwd \
+    && echo '3proxy:x:10001:' > ./etc/group \
+    && wget -O ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64" \
+    && chmod +x ./bin/dumb-init
+
 # Copy binaries
-COPY --from=builder /lib/x86_64-linux-gnu/libdl.so.* /lib/
-COPY --from=builder /tmp/3proxy/bin/3proxy /bin/
-COPY --from=builder /tmp/3proxy/bin/*.ld.so /usr/local/3proxy/libexec/
+COPY --from=builder /lib/x86_64-linux-gnu/libdl.so.* ./lib/
+COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
+COPY --from=builder /tmp/3proxy/bin/*.ld.so ./usr/local/3proxy/libexec/
+COPY 3proxy.cfg ./etc/3proxy/3proxy.cfg
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
-# Create unprivileged user
-RUN set -x \
-    && adduser \
-        --disabled-password \
-        --gecos "" \
-        --home /nonexistent \
-        --shell /sbin/nologin \
-        --no-create-home \
-        --uid 10001 \
-        3proxy
+RUN chown -R 10001:10001 ./etc/3proxy
 
-# Prepare files and directories
-RUN set -x \
-    && chown -R 10001:10001 /usr/local/3proxy \
-    && chmod -R 550 /usr/local/3proxy \
-    && chmod -R 555 /usr/local/3proxy/libexec \
-    && chown -R root /usr/local/3proxy/libexec \
-    && mkdir /etc/3proxy \
-    && chown -R 10001:10001 /etc/3proxy
-
-# Copy our config and entrypoint script
-COPY 3proxy.cfg /etc/3proxy/3proxy.cfg
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-
-# Split all buffered layers into one
-FROM scratch
+FROM busybox:1.34.0-glibc
 
 LABEL \
     org.opencontainers.image.title="3proxy" \
@@ -77,11 +67,15 @@ LABEL \
     org.opencontainers.image.licenses="WTFPL"
 
 # Import from builder
-COPY --from=buffer / /
+COPY --from=buffer /tmp/rootfs /
 
 # Use an unprivileged user
 USER 3proxy:3proxy
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+# Docs: <https://docs.docker.com/engine/reference/builder/#healthcheck>
+HEALTHCHECK --interval=5s --timeout=2s --retries=2 --start-period=2s CMD \
+    netstat -ltn | grep 3128 && netstat -ltn | grep 1080
 
-CMD ["/bin/3proxy", "/etc/3proxy/3proxy.cfg"]
+ENTRYPOINT ["/bin/dumb-init", "--"]
+
+CMD ["/docker-entrypoint.sh", "/bin/3proxy", "/etc/3proxy/3proxy.cfg"]
