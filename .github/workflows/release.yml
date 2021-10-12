@@ -38,5 +38,5 @@ jobs:
           tags: |
             tarampampam/3proxy:${{ steps.slug.outputs.version-semantic }}
             tarampampam/3proxy:latest
-            ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:${{ steps.slug.outputs.version-semantic }}
-            ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest
+            ghcr.io/${{ github.actor }}/3proxy:${{ steps.slug.outputs.version-semantic }}
+            ghcr.io/${{ github.actor }}/3proxy:latest
