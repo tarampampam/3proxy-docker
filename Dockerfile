@@ -34,7 +34,7 @@ RUN set -x \
     && strip ./bin/SSLPlugin.ld.so
 
 # Prepare filesystem for 3proxy running
-FROM busybox:1.34.0-glibc as buffer
+FROM busybox:1.34.1-glibc as buffer
 
 # create a directory for the future root filesystem
 WORKDIR /tmp/rootfs
@@ -56,7 +56,7 @@ COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
 RUN chown -R 10001:10001 ./etc/3proxy
 
-FROM busybox:1.34.0-glibc
+FROM busybox:1.34.1-glibc
 
 LABEL \
     org.opencontainers.image.title="3proxy" \
