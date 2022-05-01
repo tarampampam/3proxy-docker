@@ -40,7 +40,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         run: docker save 3proxy:local > ./docker-image.tar
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docker-image
           path: ./docker-image.tar
