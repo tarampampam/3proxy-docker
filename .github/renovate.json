@@ -10,7 +10,7 @@
     "regexManagers": [
         {
             "fileMatch": ["^Dockerfile$"],
-            "matchStrings": ["datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s(ARG|ENV) .*?_(VERSION|VER)=(?<currentValue>.*)\\s"],
+            "matchStrings": ["datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s(ARG|ENV) .*?_(VERSION|VER)=(?<currentValue>.*)\\s"],
             "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
         }
     ]
