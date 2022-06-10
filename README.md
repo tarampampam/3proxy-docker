@@ -18,10 +18,10 @@
 
 TCP ports:
 
-Port number | Description
------------ | -----------
-`3128`      | [HTTP proxy](https://3proxy.org/doc/man8/proxy.8.html)
-`1080`      | [SOCKS proxy](https://3proxy.org/doc/man8/socks.8.html)
+| Port number | Description                                             |
+|-------------|---------------------------------------------------------|
+| `3128`      | [HTTP proxy](https://3proxy.org/doc/man8/proxy.8.html)  |
+| `1080`      | [SOCKS proxy](https://3proxy.org/doc/man8/socks.8.html) |
 
 ## Supported tags
 
@@ -31,10 +31,10 @@ All supported image tags [can be found here][link_docker_tags].
 
 ## Supported environment variables
 
-Variable name    | Description                               | Example
----------------- | ----------------------------------------- | ---------------
-`PROXY_LOGIN`    | Authorization login                       | `username`
-`PROXY_PASSWORD` | Authorization password                    | `password`
+| Variable name    | Description            | Example    |
+|------------------|------------------------|------------|
+| `PROXY_LOGIN`    | Authorization login    | `username` |
+| `PROXY_PASSWORD` | Authorization password | `password` |
 
 ## How can I use this?
 

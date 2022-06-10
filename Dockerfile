@@ -1,12 +1,12 @@
 # Image page: <https://hub.docker.com/_/gcc>
 FROM gcc:12.1.0 as builder
 
-# e.g.: `docker build --build-arg "VERSION=0.9.4" .`
-ARG VERSION="0.9.4"
+# e.g.: `docker build --build-arg "3PROXY_VERSION=0.9.4" .`
+ARG 3PROXY_VERSION=0.9.3
 
 # Fetch 3proxy sources
 RUN set -x \
-    && git clone --branch "${VERSION}" https://github.com/z3APA3A/3proxy.git /tmp/3proxy
+    && git clone --branch "${3PROXY_VERSION}" https://github.com/z3APA3A/3proxy.git /tmp/3proxy
 
 WORKDIR /tmp/3proxy
 

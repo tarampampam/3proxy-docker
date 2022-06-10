@@ -1,0 +1,24 @@
+{
+    "labels": [
+        "dependencies"
+    ],
+    "assignees": [
+        "tarampampam"
+    ],
+    "extends": [
+        "config:base",
+        ":disableDependencyDashboard"
+    ],
+    "regexManagers": [
+        {
+            "fileMatch": [
+                "^Dockerfile$"
+            ],
+            "matchStrings": [
+                "ARG 3PROXY_VERSION=(?<currentValue>.*?)\n"
+            ],
+            "depNameTemplate": "github.com/z3APA3A/3proxy",
+            "datasourceTemplate": "git-tags"
+        }
+    ]
+}
