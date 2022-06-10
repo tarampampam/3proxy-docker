@@ -2,7 +2,7 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "labels": ["dependencies"],
     "assignees": ["tarampampam"],
-    "enabledManagers": ["dockerfile"],
+    "enabledManagers": ["regex"],
     "extends": [
         "config:base",
         ":disableDependencyDashboard"
@@ -10,9 +10,8 @@
     "regexManagers": [
         {
             "fileMatch": ["^Dockerfile$"],
-            "matchStrings": ["ARG Z3PROXY_VERSION=(?<currentValue>.*?)\n"],
-            "depNameTemplate": "z3APA3A/3proxy",
-            "datasourceTemplate": "github-tags"
+            "matchStrings": ["datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\sARG .*?_VERSION=(?<currentValue>.*)\\s"],
+            "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
         }
     ]
 }
