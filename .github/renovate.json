@@ -1,24 +1,18 @@
 {
-    "labels": [
-        "dependencies"
-    ],
-    "assignees": [
-        "tarampampam"
-    ],
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "labels": ["dependencies"],
+    "assignees": ["tarampampam"],
+    "enabledManagers": ["dockerfile"],
     "extends": [
         "config:base",
         ":disableDependencyDashboard"
     ],
     "regexManagers": [
         {
-            "fileMatch": [
-                "^Dockerfile$"
-            ],
-            "matchStrings": [
-                "ARG Z3PROXY_VERSION=(?<currentValue>.*?)\n"
-            ],
-            "depNameTemplate": "github.com/z3APA3A/3proxy",
-            "datasourceTemplate": "git-tags"
+            "fileMatch": ["^Dockerfile$"],
+            "matchStrings": ["ARG Z3PROXY_VERSION=(?<currentValue>.*?)\n"],
+            "depNameTemplate": "z3APA3A/3proxy",
+            "datasourceTemplate": "github-tags"
         }
     ]
 }
