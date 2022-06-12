@@ -6,6 +6,10 @@ on:
     tags-ignore: ['**']
   pull_request: {}
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs: # Docs: <https://git.io/JvxXE>
   gitleaks:
     name: Gitleaks
