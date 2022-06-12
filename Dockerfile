@@ -1,8 +1,8 @@
 # Image page: <https://hub.docker.com/_/gcc>
 FROM gcc:12.1.0 as builder
 
-# renovate: datasource=github-tags depName=z3APA3A/3proxy
-ARG Z3PROXY_VERSION=0.9.4
+# renovate: source=github-tags name=z3APA3A/3proxy
+ARG Z3PROXY_VERSION=0.9.3
 
 # Fetch 3proxy sources
 RUN set -x \
