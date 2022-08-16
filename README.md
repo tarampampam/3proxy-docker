@@ -35,7 +35,7 @@ All supported image tags [can be found here][link_docker_tags].
 |----------------------|-------------------------------------|------------------------|
 | `PROXY_LOGIN`        | Authorization login                 | `username`             |
 | `PROXY_PASSWORD`     | Authorization password              | `password`             |
-| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver)   | `8.8.8.8`              |
+| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver)   | `8.8.8.8:5353/tcp`     |
 | `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver) | `2001:4860:4860::8844` |
 
 ## How can I use this?
