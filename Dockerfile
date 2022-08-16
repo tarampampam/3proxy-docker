@@ -6,7 +6,7 @@ ARG Z3PROXY_VERSION=0.9.4
 
 # Fetch 3proxy sources
 RUN set -x \
-    && git clone --branch "${Z3PROXY_VERSION}" https://github.com/z3APA3A/3proxy.git /tmp/3proxy
+    && git -c advice.detachedHead=false clone --depth 1 --branch "${Z3PROXY_VERSION}" https://github.com/z3APA3A/3proxy.git /tmp/3proxy
 
 WORKDIR /tmp/3proxy
 
