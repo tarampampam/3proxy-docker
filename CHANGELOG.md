@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 
 ### Added
 
-- Possibility of changing DNS resolvers using environment variables `NAME_SERVER_1` (primary) and `NAME_SERVER_2` (secondary)
+- Possibility of changing DNS resolvers using environment variables `PRIMARY_RESOLVER` (primary) and `SECONDARY_RESOLVER` (secondary)
 
 ## v1.5.0
 

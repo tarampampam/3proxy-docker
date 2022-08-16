@@ -31,12 +31,12 @@ All supported image tags [can be found here][link_docker_tags].
 
 ## Supported environment variables
 
-| Variable name    | Description                         | Example                |
-|------------------|-------------------------------------|------------------------|
-| `PROXY_LOGIN`    | Authorization login                 | `username`             |
-| `PROXY_PASSWORD` | Authorization password              | `password`             |
-| `NAME_SERVER_1`  | Primary nameserver (dns resolver)   | `8.8.8.8`              |
-| `NAME_SERVER_2`  | Secondary nameserver (dns resolver) | `2001:4860:4860::8844` |
+| Variable name        | Description                         | Example                |
+|----------------------|-------------------------------------|------------------------|
+| `PROXY_LOGIN`        | Authorization login                 | `username`             |
+| `PROXY_PASSWORD`     | Authorization password              | `password`             |
+| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver)   | `8.8.8.8`              |
+| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver) | `2001:4860:4860::8844` |
 
 ## How can I use this?
 
@@ -57,7 +57,7 @@ $ docker run --rm -d \
     -p "1080:1080/tcp" \
     -e "PROXY_LOGIN=evil" \
     -e "PROXY_PASSWORD=live" \
-    -e "NAME_SERVER_1=2001:4860:4860::8888" \
+    -e "PRIMARY_RESOLVER=2001:4860:4860::8888" \
     tarampampam/3proxy:latest
 ```
 
