@@ -16,4 +16,4 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_LOGIN }}
           password: ${{ secrets.DOCKER_USER_PASSWORD }}
-          repository: tarampampam/mustpl
+          repository: tarampampam/3proxy

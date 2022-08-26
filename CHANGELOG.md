@@ -8,11 +8,16 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 
 ### Added
 
-- ...
+- The following environment variables are supported now: `MAX_CONNECTIONS`, `PROXY_PORT`, `SOCKS_PORT`
 
 ### Changed
 
-- ...
+- Entrypoint script (`bash`) replaced with [`mustpl`](https://github.com/tarampampam/mustpl)
+- The result docker image `busybox:1.34.1-glibc` replaced with `busybox:stable-glibc`
+
+### Removed
+
+- Dockerfile healthcheck
 
 ## v1.6.0
 
