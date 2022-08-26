@@ -25,18 +25,24 @@ TCP ports:
 
 ## Supported tags
 
-[![image stats](https://dockeri.co/image/tarampampam/3proxy)][link_docker_tags]
+| Registry                               | Image                        |
+|----------------------------------------|------------------------------|
+| [GitHub Container Registry][link_ghcr] | `ghcr.io/tarampampam/3proxy` |
+| [Docker Hub][link_docker_hub]          | `tarampampam/3proxy`         |
 
 All supported image tags [can be found here][link_docker_tags].
 
 ## Supported environment variables
 
-| Variable name        | Description                         | Example                |
-|----------------------|-------------------------------------|------------------------|
-| `PROXY_LOGIN`        | Authorization login                 | `username`             |
-| `PROXY_PASSWORD`     | Authorization password              | `password`             |
-| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver)   | `8.8.8.8:5353/tcp`     |
-| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver) | `2001:4860:4860::8844` |
+| Variable name        | Description                                               | Example                |
+|----------------------|-----------------------------------------------------------|------------------------|
+| `PROXY_LOGIN`        | Authorization login (empty by default)                    | `username`             |
+| `PROXY_PASSWORD`     | Authorization password (empty by default)                 | `password`             |
+| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver; `1.0.0.1` by default)   | `8.8.8.8:5353/tcp`     |
+| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver; `8.8.4.4` by default) | `2001:4860:4860::8844` |
+| `MAX_CONNECTIONS`    | Maximal connections count (`1024` by default)             | `2056`                 |
+| `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                | `8080`                 |
+| `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)               | `8888`                 |
 
 ## How can I use this?
 
@@ -81,7 +87,7 @@ Changes log can be [found here][link_changes_log].
 [![Issues][badge_issues]][link_issues]
 [![Issues][badge_pulls]][link_pulls]
 
-If you will find any package errors, please, [make an issue][link_create_issue] in current repository.
+If you find any errors, please, [make an issue][link_create_issue] in current repository.
 
 ## License
 
@@ -106,4 +112,5 @@ WTFPL. Use anywhere for your pleasure.
 [link_license]:https://github.com/tarampampam/3proxy-docker/blob/master/LICENSE
 [link_docker_tags]:https://hub.docker.com/r/tarampampam/3proxy/tags
 [link_docker_hub]:https://hub.docker.com/r/tarampampam/3proxy/
+[link_ghcr]:https://github.com/tarampampam/3proxy-docker/pkgs/container/3proxy
 [link_3proxy]:https://github.com/z3APA3A/3proxy
