@@ -5,27 +5,29 @@ config /etc/3proxy/3proxy.cfg
 system "echo `which 3proxy`': Starting 3proxy'"
 
 # We can configure nservers to avoid unsafe gethostbyname() usage (max 5 servers)
-#NSERVER1
-#NSERVER2
-nserver 1.0.0.1
-nserver 1.1.1.1
-nserver 8.8.4.4
+{{#name_servers}}
+nserver {{ . }}
+{{/name_servers}}
 
 # nscache is good to save speed, traffic and bandwidth
-nscache 65536
+nscache {{ name_servers_cache }}
 
 # Here we can change timeout values
 timeouts 1 5 30 60 180 1800 15 60
 
 # Logging docs: <https://3proxy.org/doc/howtor.html#LOGFORMAT>
-log /dev/stdout
+log {{ log.output }}
 logformat "-\""+_G{""time_unix"":%t, ""proxy"":{""type:"":""%N"", ""port"":%p}, ""error"":{""code"":""%E""}, ""auth"":{""user"":""%U""}, ""client"":{""ip"":""%C"", ""port"":%c}, ""server"":{""ip"":""%R"", ""port"":%r}, ""bytes"":{""sent"":%O, ""received"":%I}, ""request"":{""hostname"":""%n""}, ""message"":""%T""}"
 
-maxconn 1024
+maxconn {{ max_connections }}
 
-#AUTH_SETTINGS
+{{^auth.login=}}{{^auth.password=}}
+users {{ auth.login }}:CL:{{ auth.password }}
+auth strong
+allow {{ auth.login }}
+{{/auth.password=}}{{/auth.login=}}
 
-proxy -a -p3128
-socks -a -p1080
+proxy -a -p{{ ports.proxy }}
+socks -a -p{{ ports.socks }}
 
 flush

@@ -1,0 +1,22 @@
+{
+  "log": {
+    "output": "/dev/stdout"
+  },
+  "name_servers": [
+    "${PRIMARY_RESOLVER:-1.0.0.1}",
+    "${SECONDARY_RESOLVER:-8.8.4.4}",
+    "1.1.1.1",
+    "9.9.9.9",
+    "8.8.8.8"
+  ],
+  "name_servers_cache": 65536,
+  "max_connections": "${MAX_CONNECTIONS:-1024}",
+  "auth": {
+    "login": "${PROXY_LOGIN:-}",
+    "password": "${PROXY_PASSWORD:-}"
+  },
+  "ports": {
+    "proxy": "${PROXY_PORT:-3128}",
+    "socks": "${SOCKS_PORT:-1080}"
+  }
+}

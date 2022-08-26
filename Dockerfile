@@ -34,7 +34,7 @@ RUN set -x \
     && strip ./bin/SSLPlugin.ld.so
 
 # Prepare filesystem for 3proxy running
-FROM busybox:1.34.1-glibc as buffer
+FROM busybox:stable-glibc as buffer
 
 # create a directory for the future root filesystem
 WORKDIR /tmp/rootfs
@@ -47,16 +47,17 @@ RUN set -x \
     && wget -O ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64" \
     && chmod +x ./bin/dumb-init
 
-# Copy binaries
 COPY --from=builder /lib/x86_64-linux-gnu/libdl.so.* ./lib/
 COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
 COPY --from=builder /tmp/3proxy/bin/*.ld.so ./usr/local/3proxy/libexec/
-COPY 3proxy.cfg ./etc/3proxy/3proxy.cfg
-COPY docker-entrypoint.sh ./docker-entrypoint.sh
+COPY --from=ghcr.io/tarampampam/mustpl:0.1.0 /bin/mustpl ./bin/mustpl
+COPY 3proxy.cfg.json ./etc/3proxy/3proxy.cfg.json
+COPY 3proxy.cfg.mustach ./etc/3proxy/3proxy.cfg.mustach
 
 RUN chown -R 10001:10001 ./etc/3proxy
 
-FROM busybox:1.34.1-glibc
+# Merge into a single layer
+FROM busybox:stable-glibc
 
 LABEL \
     org.opencontainers.image.title="3proxy" \
@@ -72,10 +73,12 @@ COPY --from=buffer /tmp/rootfs /
 # Use an unprivileged user
 USER 3proxy:3proxy
 
-# Docs: <https://docs.docker.com/engine/reference/builder/#healthcheck>
-HEALTHCHECK --interval=5s --timeout=2s --retries=2 --start-period=2s CMD \
-    netstat -ltn | grep 3128 && netstat -ltn | grep 1080
+ENTRYPOINT [ \
+    "/bin/mustpl", \
+    "-f", "/etc/3proxy/3proxy.cfg.json", \
+    "-o", "/etc/3proxy/3proxy.cfg", \
+    "/etc/3proxy/3proxy.cfg.mustach", \
+    "--", "/bin/dumb-init" \
+]
 
-ENTRYPOINT ["/bin/dumb-init", "--"]
-
-CMD ["/docker-entrypoint.sh", "/bin/3proxy", "/etc/3proxy/3proxy.cfg"]
+CMD ["/bin/3proxy", "/etc/3proxy/3proxy.cfg"]
