@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  proxy:
+    image: tarampampam/3proxy:latest
+    restart: always
+    container_name: 3proxy
+    hostname: proxy
+    environment:
+      PROXY_LOGIN: ${PROXY_LOGIN}
+      PROXY_PASSWORD: ${PROXY_PASSWORD}
+      PRIMARY_RESOLVER: ${PRIMARY_RESOLVER}
+      SECONDARY_RESOLVER: ${SECONDARY_RESOLVER}
+      MAX_CONNECTIONS: ${MAX_CONNECTIONS}
+      PROXY_PORT: ${PROXY_PORT}
+      SOCKS_PORT: ${SOCKS_PORT}
+    ports:
+      - ${PROXY_PORT}:${PROXY_PORT}/tcp
+      - ${SOCKS_PORT}:${SOCKS_PORT}/tcp
