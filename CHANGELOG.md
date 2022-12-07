@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 
 ### Added
 
-- `EXTRA_ACCOUNTS` environment variables is supported now [#28]
+- `EXTRA_ACCOUNTS` environment variable is supported now [#28]
 
 [#28]:https://github.com/tarampampam/3proxy-docker/issues/28
 
