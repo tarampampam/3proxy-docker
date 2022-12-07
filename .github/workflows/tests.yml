@@ -79,7 +79,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         auth: [yes, no]
     needs: [build-image]
     steps:
-      - name: Download builded docker image
+      - name: Download built docker image
         uses: actions/download-artifact@v3
         with:
           name: docker-image
