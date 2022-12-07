@@ -22,9 +22,9 @@ logformat "-\""+_G{""time_unix"":%t, ""proxy"":{""type:"":""%N"", ""port"":%p}, 
 maxconn {{ max_connections }}
 
 {{^auth.login=}}{{^auth.password=}}
-users {{ auth.login }}:CL:{{ auth.password }}
+users {{ auth.login }}:CL:{{ auth.password }}{{#auth.extra_accounts.*}} {{ * }}:CL:{{ . }}{{/auth.extra_accounts.*}}
 auth strong
-allow {{ auth.login }}
+allow {{ auth.login }}{{#auth.extra_accounts.*}} {{ * }}{{/auth.extra_accounts.*}}
 {{/auth.password=}}{{/auth.login=}}
 
 proxy -a -p{{ ports.proxy }}
