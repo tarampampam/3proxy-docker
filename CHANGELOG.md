@@ -4,6 +4,14 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v1.8.0
+
+### Added
+
+- `EXTRA_ACCOUNTS` environment variables is supported now [#28]
+
+[#28]:https://github.com/tarampampam/3proxy-docker/issues/28
+
 ## v1.7.0
 
 ### Added
