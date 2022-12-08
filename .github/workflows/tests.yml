@@ -79,7 +79,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         auth: [yes, no]
     needs: [build-image]
     steps:
-      - name: Download builded docker image
+      - name: Download built docker image
         uses: actions/download-artifact@v3
         with:
           name: docker-image
@@ -95,7 +95,7 @@ jobs: # Docs: <https://git.io/JvxXE>
 
       - name: Start server with auth setup
         if: matrix.auth == 'yes'
-        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" -e "PROXY_LOGIN=evil" -e "PROXY_PASSWORD=live" 3proxy:local
+        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" -e "PROXY_LOGIN=evil" -e "PROXY_PASSWORD=live" -e 'EXTRA_ACCOUNTS={"foo":"bar"}' 3proxy:local
 
       - name: Pause
         run: sleep 3
@@ -124,6 +124,16 @@ jobs: # Docs: <https://git.io/JvxXE>
           curl -v --fail \
             --proxy http://127.0.0.1:3128 \
             --proxy-user evil:live \
+            --connect-timeout 3 \
+            --max-time 3 \
+            https://www.cloudflare.com/robots.txt
+
+      - name: Try to use HTTP proxy (with auth, extra user)
+        if: matrix.auth == 'yes'
+        run: |
+          curl -v --fail \
+            --proxy http://127.0.0.1:3128 \
+            --proxy-user foo:bar \
             --connect-timeout 3 \
             --max-time 3 \
             https://www.cloudflare.com/robots.txt

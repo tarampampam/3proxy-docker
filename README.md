@@ -34,15 +34,16 @@ All supported image tags [can be found here][link_docker_tags].
 
 ## Supported environment variables
 
-| Variable name        | Description                                               | Example                |
-|----------------------|-----------------------------------------------------------|------------------------|
-| `PROXY_LOGIN`        | Authorization login (empty by default)                    | `username`             |
-| `PROXY_PASSWORD`     | Authorization password (empty by default)                 | `password`             |
-| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver; `1.0.0.1` by default)   | `8.8.8.8:5353/tcp`     |
-| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver; `8.8.4.4` by default) | `2001:4860:4860::8844` |
-| `MAX_CONNECTIONS`    | Maximal connections count (`1024` by default)             | `2056`                 |
-| `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                | `8080`                 |
-| `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)               | `8888`                 |
+| Variable name        | Description                                               | Example                           |
+|----------------------|-----------------------------------------------------------|-----------------------------------|
+| `PROXY_LOGIN`        | Authorization login (empty by default)                    | `username`                        |
+| `PROXY_PASSWORD`     | Authorization password (empty by default)                 | `password`                        |
+| `EXTRA_ACCOUNTS`     | Additional proxy users                                    | `{"evil":"live", "guest":"pass"}` |
+| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver; `1.0.0.1` by default)   | `8.8.8.8:5353/tcp`                |
+| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver; `8.8.4.4` by default) | `2001:4860:4860::8844`            |
+| `MAX_CONNECTIONS`    | Maximal connections count (`1024` by default)             | `2056`                            |
+| `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                | `8080`                            |
+| `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)               | `8888`                            |
 
 ## How can I use this?
 

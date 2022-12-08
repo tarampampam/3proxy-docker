@@ -13,7 +13,8 @@
   "max_connections": "${MAX_CONNECTIONS:-1024}",
   "auth": {
     "login": "${PROXY_LOGIN:-}",
-    "password": "${PROXY_PASSWORD:-}"
+    "password": "${PROXY_PASSWORD:-}",
+    "extra_accounts": ${EXTRA_ACCOUNTS:-{}}
   },
   "ports": {
     "proxy": "${PROXY_PORT:-3128}",
