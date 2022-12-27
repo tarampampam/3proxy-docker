@@ -94,8 +94,8 @@ If you find any errors, please, [make an issue][link_create_issue] in current re
 
 WTFPL. Use anywhere for your pleasure.
 
-[badge_build_status]:https://img.shields.io/github/workflow/status/tarampampam/3proxy-docker/tests/master?logo=github&label=build
-[badge_release_status]:https://img.shields.io/github/workflow/status/tarampampam/3proxy-docker/release?logo=github&label=release
+[badge_build_status]:https://img.shields.io/github/actions/workflow/status/tarampampam/3proxy-docker/tests.yml?branch=master&logo=github&label=build
+[badge_release_status]:https://img.shields.io/github/actions/workflow/status/tarampampam/3proxy-docker/release.yml?logo=github&label=release
 [badge_release_date]:https://img.shields.io/github/release-date/tarampampam/3proxy-docker.svg?style=flat-square&maxAge=180
 [badge_commits_since_release]:https://img.shields.io/github/commits-since/tarampampam/3proxy-docker/latest.svg?style=flat-square&maxAge=180
 [badge_issues]:https://img.shields.io/github/issues/tarampampam/3proxy-docker.svg?style=flat-square&maxAge=180
