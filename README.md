@@ -32,7 +32,17 @@ TCP ports:
 
 All supported image tags [can be found here][link_docker_tags].
 
-> Since v1.8.1 architectures `arm64` and `ppc64le` (and `amd64` of course) are supported.
+Since v1.8.1 architectures `arm64` and `ppc64le` (and `amd64` of course) are supported:
+
+```shell
+$ docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.8.1
+Image: ghcr.io/tarampampam/3proxy:1.8.1
+ * Manifest List: Yes (Image type: application/vnd.docker.distribution.manifest.list.v2+json)
+ * Supported platforms:
+   - linux/amd64
+   - linux/arm64
+   - linux/ppc64le
+```
 
 ## Supported environment variables
 
