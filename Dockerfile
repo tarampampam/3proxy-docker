@@ -44,9 +44,11 @@ RUN set -x \
     && mkdir -p ./etc ./bin ./usr/local/3proxy/libexec ./etc/3proxy \
     && echo '3proxy:x:10001:10001::/nonexistent:/sbin/nologin' > ./etc/passwd \
     && echo '3proxy:x:10001:' > ./etc/group \
-    && echo "$(arch)" \
-    && wget -O ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(arch)" \
-    && chmod +x ./bin/dumb-init
+    && apk add --virtual .build-deps curl ca-certificates \
+    && update-ca-certificates \
+    && curl -SsL -o ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(arch)" \
+    && chmod +x ./bin/dumb-init \
+    && apk del .build-deps
 
 COPY --from=builder /lib/*-linux-gnu/libdl.so.* ./lib/
 COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
