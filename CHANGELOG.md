@@ -4,6 +4,12 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v1.8.2
+
+### Removed
+
+- `ppc64le` architecture support
+
 ## v1.8.1
 
 ### Added

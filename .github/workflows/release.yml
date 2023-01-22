@@ -32,7 +32,7 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64,linux/ppc64le
+          platforms: linux/amd64,linux/arm64
           tags: |
             tarampampam/3proxy:${{ steps.slug.outputs.version-semantic }}
             tarampampam/3proxy:latest
