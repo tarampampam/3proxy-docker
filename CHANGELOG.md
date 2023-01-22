@@ -4,6 +4,12 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v1.8.1
+
+### Added
+
+- Multiarch support (`arm64` and `ppc64le`)
+
 ## v1.8.0
 
 ### Added

@@ -44,10 +44,10 @@ RUN set -x \
     && mkdir -p ./etc ./bin ./usr/local/3proxy/libexec ./etc/3proxy \
     && echo '3proxy:x:10001:10001::/nonexistent:/sbin/nologin' > ./etc/passwd \
     && echo '3proxy:x:10001:' > ./etc/group \
-    && wget -O ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64" \
+    && wget -O ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(arch)" \
     && chmod +x ./bin/dumb-init
 
-COPY --from=builder /lib/x86_64-linux-gnu/libdl.so.* ./lib/
+COPY --from=builder /lib/*-linux-gnu/libdl.so.* ./lib/
 COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
 COPY --from=builder /tmp/3proxy/bin/*.ld.so ./usr/local/3proxy/libexec/
 COPY --from=ghcr.io/tarampampam/mustpl:0.1.0 /bin/mustpl ./bin/mustpl
