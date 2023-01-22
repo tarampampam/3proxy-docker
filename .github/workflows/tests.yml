@@ -34,7 +34,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         with:
           context: .
           push: false
-          platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
+          platforms: linux/amd64,linux/arm64,linux/ppc64le
           tags: 3proxy:local
 
       - name: Build docker image
