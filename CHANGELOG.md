@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 
 ### Added
 
-- Multiarch support (`arm64` and `ppc64le`)
+- Multi-arch image support (plus `arm64` and `ppc64le`)
 
 ## v1.8.0
 

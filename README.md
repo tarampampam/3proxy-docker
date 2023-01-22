@@ -32,6 +32,8 @@ TCP ports:
 
 All supported image tags [can be found here][link_docker_tags].
 
+> Since v1.8.1 architectures `arm64` and `ppc64le` (and `amd64` of course) are supported.
+
 ## Supported environment variables
 
 | Variable name        | Description                                               | Example                           |
@@ -53,7 +55,7 @@ For example:
 $ docker run --rm -d \
     -p "3128:3128/tcp" \
     -p "1080:1080/tcp" \
-    tarampampam/3proxy:latest
+    ghcr.io/tarampampam/3proxy:latest
 ```
 
 Or with auth & resolver settings:
@@ -65,7 +67,7 @@ $ docker run --rm -d \
     -e "PROXY_LOGIN=evil" \
     -e "PROXY_PASSWORD=live" \
     -e "PRIMARY_RESOLVER=2001:4860:4860::8888" \
-    tarampampam/3proxy:latest
+    ghcr.io/tarampampam/3proxy:latest
 ```
 
 ## Releasing
