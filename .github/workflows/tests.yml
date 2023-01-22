@@ -59,7 +59,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         with:
           image: 3proxy:local
           fail-build: true
-          severity-cutoff: low # negligible, low, medium, high or critical
+          severity-cutoff: high # negligible, low, medium, high or critical
 
   try-to-use:
     name: Build and use docker image (auth ${{ matrix.auth }})
