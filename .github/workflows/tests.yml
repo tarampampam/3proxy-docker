@@ -56,10 +56,15 @@ jobs: # Docs: <https://git.io/JvxXE>
 
       - name: Scan image
         uses: anchore/scan-action@v3 # action page: <https://github.com/anchore/scan-action>
+        id: scan
         with:
           image: 3proxy:local
           fail-build: true
           severity-cutoff: high # negligible, low, medium, high or critical
+
+      - uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
 
   try-to-use:
     name: Build and use docker image (auth ${{ matrix.auth }})
