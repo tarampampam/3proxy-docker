@@ -39,16 +39,16 @@ FROM busybox:stable-glibc as buffer
 # create a directory for the future root filesystem
 WORKDIR /tmp/rootfs
 
+COPY --from=tarampampam/curl:7.87.0 /bin/curl /bin/curl
+COPY --from=tarampampam/curl:7.87.0 /etc/ssl/certs /etc/ssl/certs
+
 # prepare the root filesystem
 RUN set -x \
     && mkdir -p ./etc ./bin ./usr/local/3proxy/libexec ./etc/3proxy \
     && echo '3proxy:x:10001:10001::/nonexistent:/sbin/nologin' > ./etc/passwd \
     && echo '3proxy:x:10001:' > ./etc/group \
-    && apk add --virtual .build-deps curl ca-certificates \
-    && update-ca-certificates \
     && curl -SsL -o ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(arch)" \
-    && chmod +x ./bin/dumb-init \
-    && apk del .build-deps
+    && chmod +x ./bin/dumb-init
 
 COPY --from=builder /lib/*-linux-gnu/libdl.so.* ./lib/
 COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
