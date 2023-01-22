@@ -34,7 +34,21 @@ jobs: # Docs: <https://git.io/JvxXE>
         with:
           context: .
           push: false
-          platforms: linux/amd64,linux/arm64,linux/ppc64le
+          platforms: linux/amd64
+          tags: 3proxy:local
+
+      - uses: docker/build-push-action@v3 # Action page: <https://github.com/docker/build-push-action>
+        with:
+          context: .
+          push: false
+          platforms: linux/arm64
+          tags: 3proxy:local
+
+      - uses: docker/build-push-action@v3 # Action page: <https://github.com/docker/build-push-action>
+        with:
+          context: .
+          push: false
+          platforms: linux/ppc64le
           tags: 3proxy:local
 
       - name: Build docker image
