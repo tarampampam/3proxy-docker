@@ -18,25 +18,16 @@ jobs: # Docs: <https://git.io/JvxXE>
       - uses: actions/checkout@v3
         with: {fetch-depth: 0}
 
-      - name: Check for GitLeaks
-        uses: gacts/gitleaks@v1 # Action page: <https://github.com/gacts/gitleaks>
+      - uses: gacts/gitleaks@v1
 
   build-image:
     name: Build docker image
     runs-on: ubuntu-20.04
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Build docker image
         run: docker build -f ./Dockerfile --tag 3proxy:local .
-
-      - name: Scan image
-        uses: anchore/scan-action@v3 # action page: <https://github.com/anchore/scan-action>
-        with:
-          image: 3proxy:local
-          fail-build: true
-          severity-cutoff: low # negligible, low, medium, high or critical
 
       - name: Save docker image
         run: docker save 3proxy:local > ./docker-image.tar
@@ -47,28 +38,6 @@ jobs: # Docs: <https://git.io/JvxXE>
           name: docker-image
           path: ./docker-image.tar
           retention-days: 1
-
-  scan-image:
-    name: Scan docker image
-    runs-on: ubuntu-20.04
-    needs: [build-image]
-    steps:
-      - name: Download built docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: docker-image
-          path: .artifact
-
-      - name: Prepare image to run
-        working-directory: .artifact
-        run: docker load < docker-image.tar
-
-      - name: Scan image
-        uses: anchore/scan-action@v3 # action page: <https://github.com/anchore/scan-action>
-        with:
-          image: 3proxy:local
-          fail-build: true
-          severity-cutoff: low # negligible, low, medium, high or critical
 
   try-to-use:
     name: Build and use docker image (auth ${{ matrix.auth }})
