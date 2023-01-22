@@ -44,6 +44,8 @@ jobs: # Docs: <https://git.io/JvxXE>
     runs-on: ubuntu-20.04
     needs: [build-image]
     steps:
+      - uses: actions/checkout@v3 # needed for anchore to work
+
       - name: Download built docker image
         uses: actions/download-artifact@v3
         with:
