@@ -8,11 +8,13 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 
 ### Added
 
-- Multi-arch image support (plus `arm64` and `ppc64le`)
+- Multi-arch image support (plus `arm64` and `ppc64le`) [#31]
 
 ### Fixed
 
-- Error page colors now depend on the theme, and the text is centered
+- Error page colors now depend on the theme, and the text is centered [#31]
+
+[#31]:https://github.com/tarampampam/3proxy-docker/pull/31
 
 ## v1.8.0
 
