@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 
 - Multi-arch image support (plus `arm64` and `ppc64le`)
 
+### Fixed
+
+- Error page colors now depend on the theme, and the text is centered
+
 ## v1.8.0
 
 ### Added

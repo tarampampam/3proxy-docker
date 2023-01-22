@@ -14,10 +14,12 @@ WORKDIR /tmp/3proxy
 RUN set -x \
     && echo '#define ANONYMOUS 1' >> ./src/3proxy.h \
     # proxy.c source: <https://github.com/z3APA3A/3proxy/blob/0.9.3/src/proxy.c>
-    && sed -i 's~\(<\/head>\)~<style>html,body{background-color:#222526;color:#fff;font-family:sans-serif;\
-text-align:center;display:flex;flex-direction:column;justify-content:center}h1,h2{margin-bottom:0;font-size:2.5em}\
-h2::before{content:'"'"'Proxy error'"'"';display:block;font-size:0.4em;color:#bbb;font-weight:100}\
-h3,p{color:#bbb}</style>\1~' ./src/proxy.c \
+    && sed -i 's~\(<\/head>\)~<style>:root{--color-bg-primary:#fff;--color-text-primary:#131313;--color-text-secondary:#232323}\
+@media (prefers-color-scheme: dark){:root{--color-bg-primary:#212121;--color-text-primary:#fafafa;--color-text-secondary:#bbb}}\
+html,body{height:100%;font-family:sans-serif;background-color:var(--color-bg-primary);color:var(--color-text-primary);margin:0;\
+padding:0;text-align:center}body{align-items:center;display:flex;justify-content:center;flex-direction:column;height:100vh}\
+h1,h2{margin-bottom:0;font-size:2.5em}h2::before{content:'"'"'Proxy error'"'"';display:block;font-size:.4em;\
+color:var(--color-text-secondary);font-weight:100}h3,p{color:var(--color-text-secondary)}</style>\1~' ./src/proxy.c \
     && cat ./src/proxy.c | grep '</head>'
 
 # And compile
