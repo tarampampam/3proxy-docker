@@ -1,5 +1,5 @@
 # Image page: <https://hub.docker.com/_/gcc>
-FROM gcc:12.2.0 as builder
+FROM gcc:13.1.0 as builder
 
 # renovate: source=github-tags name=z3APA3A/3proxy
 ARG Z3PROXY_VERSION=0.9.4
