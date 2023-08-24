@@ -55,7 +55,7 @@ RUN set -x \
 COPY --from=builder /lib/*-linux-gnu/libdl.so.* ./lib/
 COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
 COPY --from=builder /tmp/3proxy/bin/*.ld.so ./usr/local/3proxy/libexec/
-COPY --from=ghcr.io/tarampampam/mustpl:0.1.0 /bin/mustpl ./bin/mustpl
+COPY --from=ghcr.io/tarampampam/mustpl:0.1.1 /bin/mustpl ./bin/mustpl
 COPY 3proxy.cfg.json ./etc/3proxy/3proxy.cfg.json
 COPY 3proxy.cfg.mustach ./etc/3proxy/3proxy.cfg.mustach
 
