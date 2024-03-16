@@ -4,6 +4,14 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v1.9.0
+
+### Added
+
+- `EXTRA_CONFIG` environment variable is supported now [#47]
+
+[#47]:https://github.com/tarampampam/3proxy-docker/issues/47
+
 ## v1.8.3
 
 ### Fixed

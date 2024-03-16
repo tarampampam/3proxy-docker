@@ -19,5 +19,6 @@
   "ports": {
     "proxy": "${PROXY_PORT:-3128}",
     "socks": "${SOCKS_PORT:-1080}"
-  }
+  },
+  "extra_config": "${EXTRA_CONFIG}"
 }
