@@ -55,7 +55,7 @@ Image: ghcr.io/tarampampam/3proxy:1.8.2
 | `MAX_CONNECTIONS`    | Maximal connections count (`1024` by default)                                     | `2056`                            |
 | `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                                        | `8080`                            |
 | `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)                                       | `8888`                            |
-| `EXTRA_CONFIG`       | Additional 3proxy configuration (will be added to the **end** of the config file) | `log /dev/stdout`                 |
+| `EXTRA_CONFIG`       | Additional 3proxy configuration (will be added to the **end** of the config file) | `# line 1\n# line 2`              |
 
 ## How can I use this?
 
