@@ -27,12 +27,13 @@ auth strong
 allow {{ auth.login }}{{#auth.extra_accounts.*}},{{ * }}{{/auth.extra_accounts.*}}
 {{/auth.password=}}{{/auth.login=}}
 
-proxy -a -p{{ ports.proxy }}
-socks -a -p{{ ports.socks }}
-
-flush{{^extra_config=}}
+{{^extra_config=}}
 
 # Additional configuration
 {{extra_config}}
 {{/extra_config=}}
 
+proxy -a -p{{ ports.proxy }}
+socks -a -p{{ ports.socks }}
+
+flush
