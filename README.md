@@ -10,9 +10,9 @@
 [![Docker Pulls][badge_docker_pulls]][link_docker_hub]
 [![License][badge_license]][link_license]
 
-## Why this image created?
+## Why was this image created?
 
-3proxy is awesome and lightweight proxy-server. This image contains stable version with it and can be configured using environment variables. By default, it uses anonymous (information about client hiding) proxy settings. Logging in JSON format.
+3proxy is an awesome and lightweight proxy server. This image contains the stable version and can be configured using environment variables. By default, it uses anonymous proxy settings to hide client information and logs in JSON format.
 
 > Page on `hub.docker.com` can be [found here][link_docker_hub].
 
@@ -45,17 +45,17 @@ Image: ghcr.io/tarampampam/3proxy:1.8.2
 
 ## Supported environment variables
 
-| Variable name        | Description                                                                       | Example                           |
-|----------------------|-----------------------------------------------------------------------------------|-----------------------------------|
-| `PROXY_LOGIN`        | Authorization login (empty by default)                                            | `username`                        |
-| `PROXY_PASSWORD`     | Authorization password (empty by default)                                         | `password`                        |
-| `EXTRA_ACCOUNTS`     | Additional proxy users                                                            | `{"evil":"live", "guest":"pass"}` |
-| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver; `1.0.0.1` by default)                           | `8.8.8.8:5353/tcp`                |
-| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver; `8.8.4.4` by default)                         | `2001:4860:4860::8844`            |
-| `MAX_CONNECTIONS`    | Maximal connections count (`1024` by default)                                     | `2056`                            |
-| `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                                        | `8080`                            |
-| `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)                                       | `8888`                            |
-| `EXTRA_CONFIG`       | Additional 3proxy configuration (will be added to the **end** of the config file) | `# line 1\n# line 2`              |
+| Variable name        | Description                                                                                                           | Example                           |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| `PROXY_LOGIN`        | Authorization login (empty by default)                                                                                | `username`                        |
+| `PROXY_PASSWORD`     | Authorization password (empty by default)                                                                             | `password`                        |
+| `EXTRA_ACCOUNTS`     | Additional proxy users                                                                                                | `{"evil":"live", "guest":"pass"}` |
+| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver; `1.0.0.1` by default)                                                               | `8.8.8.8:5353/tcp`                |
+| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver; `8.8.4.4` by default)                                                             | `2001:4860:4860::8844`            |
+| `MAX_CONNECTIONS`    | Maximal connections count (`1024` by default)                                                                         | `2056`                            |
+| `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                                                                            | `8080`                            |
+| `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)                                                                           | `8888`                            |
+| `EXTRA_CONFIG`       | Additional 3proxy configuration (will be added to the **end** of the config file, but before the `proxy` and `flush`) | `# line 1\n# line 2`              |
 
 ## How can I use this?
 
@@ -82,12 +82,12 @@ $ docker run --rm -d \
 
 ## Releasing
 
-New versions publishing is very simple - just make required changes in this repository, update [changelog file](CHANGELOG.md) and "publish" new release using repo releases page.
+Publishing new versions is very simple: just make the required changes in this repository, update the [changelog file](CHANGELOG.md), and "publish" a new release using the repository's releases page.
 
-Docker images will be build and published automatically.
+Docker images will be built and published automatically.
 
-> New release will overwrite the `latest` docker image tag in both registers.
-
+> The new release will overwrite the `latest` docker image tag in both registries.
+> 
 ## Changes log
 
 [![Release date][badge_release_date]][link_releases]
@@ -100,7 +100,7 @@ Changes log can be [found here][link_changes_log].
 [![Issues][badge_issues]][link_issues]
 [![Issues][badge_pulls]][link_pulls]
 
-If you find any errors, please, [make an issue][link_create_issue] in current repository.
+If you find any errors, please, [make an issue][link_create_issue] in the current repository.
 
 ## License
 
