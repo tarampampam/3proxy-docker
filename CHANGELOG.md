@@ -4,6 +4,14 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v1.9.1
+
+### Fixed
+
+- Extra configuration now applies before defining the proxy server in the configuration file [#49]
+
+[#49]:https://github.com/tarampampam/3proxy-docker/pull/49
+
 ## v1.9.0
 
 ### Added
