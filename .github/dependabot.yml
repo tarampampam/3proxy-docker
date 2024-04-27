@@ -5,12 +5,12 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
-    groups: {any: {patterns: ['*']}}
+    groups: {github-actions: {patterns: ['*']}}
     schedule: {interval: monthly}
     assignees: [tarampampam]
 
   - package-ecosystem: docker
     directory: /
-    groups: {any: {patterns: ['*']}}
+    groups: {docker: {patterns: ['*']}}
     schedule: {interval: monthly}
     assignees: [tarampampam]
