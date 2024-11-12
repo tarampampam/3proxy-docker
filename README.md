@@ -88,13 +88,6 @@ Publishing new versions is very simple: just make the required changes in this r
 Docker images will be built and published automatically.
 
 > The new release will overwrite the `latest` docker image tag in both registries.
->
-## Changes log
-
-[![Release date][badge_release_date]][link_releases]
-[![Commits since latest release][badge_commits_since_release]][link_commits]
-
-Changes log can be [found here][link_changes_log].
 
 ## Support
 
