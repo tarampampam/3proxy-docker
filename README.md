@@ -56,6 +56,7 @@ Image: ghcr.io/tarampampam/3proxy:1.8.2
 | `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                                                                            | `8080`                            |
 | `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)                                                                           | `8888`                            |
 | `EXTRA_CONFIG`       | Additional 3proxy configuration (will be added to the **end** of the config file, but before the `proxy` and `flush`) | `# line 1\n# line 2`              |
+| `LOG_OUTPUT`         | Log output file path (`/dev/stdout` by default, set `/dev/null` to disable logging)                                   | `/tmp/3proxy.log`                 |
 
 ## How can I use this?
 
@@ -87,13 +88,6 @@ Publishing new versions is very simple: just make the required changes in this r
 Docker images will be built and published automatically.
 
 > The new release will overwrite the `latest` docker image tag in both registries.
-> 
-## Changes log
-
-[![Release date][badge_release_date]][link_releases]
-[![Commits since latest release][badge_commits_since_release]][link_commits]
-
-Changes log can be [found here][link_changes_log].
 
 ## Support
 

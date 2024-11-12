@@ -1,5 +1,6 @@
-# Image page: <https://hub.docker.com/_/gcc>
-FROM gcc:13.2.0 as builder
+# syntax=docker/dockerfile:1
+
+FROM gcc:13.2.0 AS builder
 
 # renovate: source=github-tags name=z3APA3A/3proxy
 ARG Z3PROXY_VERSION=0.9.4
@@ -36,7 +37,7 @@ RUN set -x \
     && strip ./bin/SSLPlugin.ld.so
 
 # Prepare filesystem for 3proxy running
-FROM alpine:latest as buffer
+FROM alpine:latest AS buffer
 
 # create a directory for the future root filesystem
 WORKDIR /tmp/rootfs
