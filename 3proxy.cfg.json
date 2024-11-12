@@ -1,6 +1,6 @@
 {
   "log": {
-    "output": "/dev/stdout"
+    "output": "${LOG_OUTPUT:-/dev/stdout}"
   },
   "name_servers": [
     "${PRIMARY_RESOLVER:-1.0.0.1}",

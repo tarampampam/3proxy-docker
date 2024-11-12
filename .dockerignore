@@ -1,8 +1,6 @@
-.editorconfig
-.git
-.github
-.idea
-.vscode
-temp
-tmp
-LICENSE
+## Ignore everything
+*
+
+## Except the following files (and directories)
+!/3proxy.cfg.json
+!/3proxy.cfg.mustach
