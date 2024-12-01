@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM gcc:13.2.0 AS builder
+FROM gcc:13.3.0 AS builder
 
 # renovate: source=github-tags name=z3APA3A/3proxy
 ARG Z3PROXY_VERSION=0.9.4
