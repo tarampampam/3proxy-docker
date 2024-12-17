@@ -4,16 +4,19 @@
 name: 🧪 Tests
 
 on:
+  workflow_dispatch: {}
   push:
     branches: [master, main]
+    paths-ignore: ['**.md']
     tags-ignore: ['**']
-  pull_request: {}
+  pull_request:
+    paths-ignore: ['**.md']
 
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
-jobs: # Docs: <https://git.io/JvxXE>
+jobs:
   gitleaks:
     name: Check for GitLeaks
     runs-on: ubuntu-latest
