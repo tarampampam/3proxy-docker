@@ -1,11 +1,16 @@
 services:
-  3proxy:
+  proxy:
     image: ghcr.io/tarampampam/3proxy:latest
     container_name: 3proxy
-    restart: unless-stopped
     environment:
       - PROXY_LOGIN=evil
       - PROXY_PASSWORD=live
+      - MAX_CONNECTIONS=10000
+      - PROXY_PORT=8000
+      - SOCKS_PORT=8001
+      - PRIMARY_RESOLVER=77.88.8.8
+      - SECONDARY_RESOLVER=8.8.8.8
     ports:
-      - "3128:3128/tcp"
-      - "1080:1080/tcp"
+      - "8000:8000/tcp"
+      - "8001:8001/tcp"
+    restart: unless-stopped
