@@ -1,18 +1,25 @@
 <p align="center">
-  <img src="https://hsto.org/webt/kp/e1/ud/kpe1udvcjss_-wtmrws-w9radke.png" width="96" alt="" />
+  <a href="https://github.com/tarampampam/3proxy-docker#readme">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://socialify.git.ci/tarampampam/3proxy-docker/image?description=1&font=Raleway&forks=1&issues=1&logo=https%3A%2F%2Fgithub.com%2Fuser-attachments%2Fassets%2F023186cf-b153-459c-8417-038fd87a2065&owner=1&pulls=1&pattern=Solid&stargazers=1&theme=Dark">
+      <img align="center" src="https://socialify.git.ci/tarampampam/3proxy-docker/image?description=1&font=Raleway&forks=1&issues=1&logo=https%3A%2F%2Fgithub.com%2Fuser-attachments%2Fassets%2F023186cf-b153-459c-8417-038fd87a2065&owner=1&pulls=1&pattern=Solid&stargazers=1&theme=Light">
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/tarampampam/3proxy-docker/actions"><img src="https://img.shields.io/github/actions/workflow/status/tarampampam/3proxy-docker/tests.yml?branch=master&maxAge=30&label=tests&logo=github&style=flat-square" alt="" /></a>
+  <a href="https://github.com/tarampampam/3proxy-docker/actions"><img src="https://img.shields.io/github/actions/workflow/status/tarampampam/3proxy-docker/release.yml?maxAge=30&label=release&logo=github&style=flat-square" alt="" /></a>
+  <a href="https://hub.docker.com/r/tarampampam/3proxy"><img src="https://img.shields.io/docker/pulls/tarampampam/3proxy.svg?maxAge=30&label=pulls&logo=docker&logoColor=white&style=flat-square" alt="" /></a>
+  <a href="https://hub.docker.com/r/tarampampam/3proxy"><img src="https://img.shields.io/docker/image-size/tarampampam/3proxy/latest?maxAge=30&label=size&logo=docker&logoColor=white&style=flat-square" alt="" /></a>
+  <a href="https://github.com/tarampampam/3proxy-docker/blob/master/LICENSE"><img src="https://img.shields.io/github/license/tarampampam/3proxy-docker.svg?maxAge=30&style=flat-square" alt="" /></a>
 </p>
 
 # Docker image with [3proxy][link_3proxy]
 
-[![Build Status][badge_build_status]][link_build_status]
-[![Release Status][badge_release_status]][link_build_status]
-[![Image size][badge_size_latest]][link_docker_hub]
-[![Docker Pulls][badge_docker_pulls]][link_docker_hub]
-[![License][badge_license]][link_license]
-
-## Why was this image created?
-
-3proxy is an awesome and lightweight proxy server. This image contains the stable version and can be configured using environment variables. By default, it uses anonymous proxy settings to hide client information and logs in JSON format.
+3proxy is a powerful and lightweight proxy server. This image includes the stable version and can be easily
+configured using environment variables. By default, it operates with anonymous proxy settings to hide client
+information and logs activity in JSON format.
 
 > Page on `hub.docker.com` can be [found here][link_docker_hub].
 
@@ -28,14 +35,19 @@ TCP ports:
 | Registry                               | Image                        |
 |----------------------------------------|------------------------------|
 | [GitHub Container Registry][link_ghcr] | `ghcr.io/tarampampam/3proxy` |
-| [Docker Hub][link_docker_hub]          | `tarampampam/3proxy`         |
+| [Docker Hub][link_docker_hub] (mirror) | `tarampampam/3proxy`         |
 
-All supported image tags [can be found here][link_docker_tags].
+> [!NOTE]
+> It’s recommended to avoid using the `latest` tag, as **major** upgrades may include breaking changes.
+> Instead, use specific tags in `X.Y.Z` format for version consistency.
 
-Since v1.8.2 architecture `arm64` (and `amd64` of course) is supported:
+All supported image tags can be [found here][link_docker_tags].
+
+> Starting with version 1.8.2, the `arm64` architecture is supported (in addition to `amd64`):
 
 ```shell
-$ docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.8.2
+docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.8.2
+
 Image: ghcr.io/tarampampam/3proxy:1.8.2
  * Manifest List: Yes (Image type: application/vnd.docker.distribution.manifest.list.v2+json)
  * Supported platforms:
@@ -43,80 +55,90 @@ Image: ghcr.io/tarampampam/3proxy:1.8.2
    - linux/arm64
 ```
 
-## Supported environment variables
+## Supported Environment Variables
 
-| Variable name        | Description                                                                                                           | Example                           |
+| Variable Name        | Description                                                                                                           | Example                           |
 |----------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | `PROXY_LOGIN`        | Authorization login (empty by default)                                                                                | `username`                        |
 | `PROXY_PASSWORD`     | Authorization password (empty by default)                                                                             | `password`                        |
-| `EXTRA_ACCOUNTS`     | Additional proxy users                                                                                                | `{"evil":"live", "guest":"pass"}` |
-| `PRIMARY_RESOLVER`   | Primary nameserver (dns resolver; `1.0.0.1` by default)                                                               | `8.8.8.8:5353/tcp`                |
-| `SECONDARY_RESOLVER` | Secondary nameserver (dns resolver; `8.8.4.4` by default)                                                             | `2001:4860:4860::8844`            |
-| `MAX_CONNECTIONS`    | Maximal connections count (`1024` by default)                                                                         | `2056`                            |
-| `PROXY_PORT`         | HTTP proxy port number (`3128` by default)                                                                            | `8080`                            |
-| `SOCKS_PORT`         | SOCKS proxy port number (`1080` by default)                                                                           | `8888`                            |
-| `EXTRA_CONFIG`       | Additional 3proxy configuration (will be added to the **end** of the config file, but before the `proxy` and `flush`) | `# line 1\n# line 2`              |
-| `LOG_OUTPUT`         | Log output file path (`/dev/stdout` by default, set `/dev/null` to disable logging)                                   | `/tmp/3proxy.log`                 |
+| `EXTRA_ACCOUNTS`     | Additional proxy users (JSON object format)                                                                           | `{"evil":"live", "guest":"pass"}` |
+| `PRIMARY_RESOLVER`   | Primary DNS resolver (`1.0.0.1` by default)                                                                           | `8.8.8.8:5353/tcp`                |
+| `SECONDARY_RESOLVER` | Secondary DNS resolver (`8.8.4.4` by default)                                                                         | `2001:4860:4860::8844`            |
+| `MAX_CONNECTIONS`    | Maximum number of connections (`1024` by default)                                                                     | `2056`                            |
+| `PROXY_PORT`         | HTTP proxy port (`3128` by default)                                                                                   | `8080`                            |
+| `SOCKS_PORT`         | SOCKS proxy port (`1080` by default)                                                                                  | `8888`                            |
+| `EXTRA_CONFIG`       | Additional 3proxy configuration (appended to the **end** of the config file, but before `proxy` and `flush`)          | `# line 1\n# line 2`              |
+| `LOG_OUTPUT`         | Path for log output (`/dev/stdout` by default; set to `/dev/null` to disable logging)                                 | `/tmp/3proxy.log`                 |
 
-## How can I use this?
+## How to Use This Image
 
-For example:
+Example usage:
 
 ```bash
-$ docker run --rm -d \
-    -p "3128:3128/tcp" \
-    -p "1080:1080/tcp" \
-    ghcr.io/tarampampam/3proxy:latest
+docker run --rm -d \
+  -p "3128:3128/tcp" \
+  -p "1080:1080/tcp" \
+  ghcr.io/tarampampam/3proxy:latest
 ```
 
-Or with auth & resolver settings:
+With authentication and custom resolver settings:
 
 ```bash
-$ docker run --rm -d \
-    -p "3128:3128/tcp" \
-    -p "1080:1080/tcp" \
-    -e "PROXY_LOGIN=evil" \
-    -e "PROXY_PASSWORD=live" \
-    -e "PRIMARY_RESOLVER=2001:4860:4860::8888" \
-    ghcr.io/tarampampam/3proxy:latest
+docker run --rm -d \
+  -p "3128:3128/tcp" \
+  -p "1080:1080/tcp" \
+  -e "PROXY_LOGIN=evil" \
+  -e "PROXY_PASSWORD=live" \
+  -e "PRIMARY_RESOLVER=2001:4860:4860::8888" \
+  ghcr.io/tarampampam/3proxy:latest
+```
+
+Docker compose example:
+
+```yaml
+services:
+  3proxy:
+    image: ghcr.io/tarampampam/3proxy:latest
+    environment:
+      PROXY_LOGIN: evil
+      PROXY_PASSWORD: live
+      MAX_CONNECTIONS: 10000
+      PROXY_PORT: 8000
+      SOCKS_PORT: 8001
+      PRIMARY_RESOLVER: 77.88.8.8
+      SECONDARY_RESOLVER: 8.8.8.8
+    ports:
+      - '8000:8000/tcp'
+      - '8001:8001/tcp'
 ```
 
 ## Releasing
 
-Publishing new versions is very simple: just make the required changes in this repository, update the [changelog file](CHANGELOG.md), and "publish" a new release using the repository's releases page.
+Publishing a new version is straightforward:
 
-Docker images will be built and published automatically.
+1. Make the necessary changes in this repository.
+2. "Publish" a new release on the repository's releases page.
 
-> The new release will overwrite the `latest` docker image tag in both registries.
+Docker images will be automatically built and published.
+
+> Note: The `latest` tag will be overwritten in both registries when a new release is published.
 
 ## Support
 
 [![Issues][badge_issues]][link_issues]
 [![Issues][badge_pulls]][link_pulls]
 
-If you find any errors, please, [make an issue][link_create_issue] in the current repository.
+If you encounter any issues, please [open an issue][link_create_issue] in this repository.
 
 ## License
 
-WTFPL. Use anywhere for your pleasure.
+This project is licensed under the WTFPL. Use it freely and enjoy!
 
-[badge_build_status]:https://img.shields.io/github/actions/workflow/status/tarampampam/3proxy-docker/tests.yml?branch=master&logo=github&label=build
-[badge_release_status]:https://img.shields.io/github/actions/workflow/status/tarampampam/3proxy-docker/release.yml?logo=github&label=release
-[badge_release_date]:https://img.shields.io/github/release-date/tarampampam/3proxy-docker.svg?style=flat-square&maxAge=180
-[badge_commits_since_release]:https://img.shields.io/github/commits-since/tarampampam/3proxy-docker/latest.svg?style=flat-square&maxAge=180
 [badge_issues]:https://img.shields.io/github/issues/tarampampam/3proxy-docker.svg?style=flat-square&maxAge=180
 [badge_pulls]:https://img.shields.io/github/issues-pr/tarampampam/3proxy-docker.svg?style=flat-square&maxAge=180
-[badge_license]:https://img.shields.io/github/license/tarampampam/3proxy-docker.svg?longCache=true
-[badge_size_latest]:https://img.shields.io/docker/image-size/tarampampam/3proxy/latest?maxAge=30
-[badge_docker_pulls]:https://img.shields.io/docker/pulls/tarampampam/3proxy.svg
-[link_releases]:https://github.com/tarampampam/3proxy-docker/releases
-[link_commits]:https://github.com/tarampampam/3proxy-docker/commits
-[link_changes_log]:https://github.com/tarampampam/3proxy-docker/blob/master/CHANGELOG.md
 [link_issues]:https://github.com/tarampampam/3proxy-docker/issues
 [link_pulls]:https://github.com/tarampampam/3proxy-docker/pulls
-[link_build_status]:https://github.com/tarampampam/3proxy-docker/actions
 [link_create_issue]:https://github.com/tarampampam/3proxy-docker/issues/new
-[link_license]:https://github.com/tarampampam/3proxy-docker/blob/master/LICENSE
 [link_docker_tags]:https://hub.docker.com/r/tarampampam/3proxy/tags
 [link_docker_hub]:https://hub.docker.com/r/tarampampam/3proxy/
 [link_ghcr]:https://github.com/tarampampam/3proxy-docker/pkgs/container/3proxy
