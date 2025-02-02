@@ -2,8 +2,27 @@ apiVersion: v1
 entries:
   proxy-3proxy:
   - apiVersion: v2
+    appVersion: 1.11.0-rc2
+    created: "2025-02-02T12:27:27.232262321Z"
+    description: Powerful and lightweight proxy server, written in pure C
+    digest: a72c75287756edac2fa714fec47f61aa367b8ba72ce7a2dc342fc7f0eb4796b8
+    home: https://github.com/3proxy/3proxy
+    icon: https://github.com/user-attachments/assets/023186cf-b153-459c-8417-038fd87a2065
+    keywords:
+    - proxy
+    - 3proxy
+    - http
+    - socks
+    name: proxy-3proxy
+    sources:
+    - https://github.com/tarampampam/3proxy-docker
+    type: application
+    urls:
+    - https://tarampampam.github.io/3proxy-docker/helm-charts/proxy-3proxy-1.11.0-rc2.tgz
+    version: 1.11.0-rc2
+  - apiVersion: v2
     appVersion: 1.11.0-rc1
-    created: "2025-02-02T11:09:15.747200899Z"
+    created: "2025-02-02T12:27:27.231761571Z"
     description: Powerful and lightweight proxy server, written in pure C
     digest: 1cf9495476a0382c8a79f249042fad8a52304cc54c717a095460ef0c204cc055
     icon: https://github.com/user-attachments/assets/023186cf-b153-459c-8417-038fd87a2065
@@ -14,4 +33,4 @@ entries:
     urls:
     - https://tarampampam.github.io/3proxy-docker/helm-charts/proxy-3proxy-1.11.0-rc1.tgz
     version: 1.11.0-rc1
-generated: "2025-02-02T11:09:15.746404925Z"
+generated: "2025-02-02T12:27:27.230973331Z"
