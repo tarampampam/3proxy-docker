@@ -70,6 +70,12 @@ Image: ghcr.io/tarampampam/3proxy:1.8.2
 | `EXTRA_CONFIG`       | Additional 3proxy configuration (appended to the **end** of the config file, but before `proxy` and `flush`)          | `# line 1\n# line 2`              |
 | `LOG_OUTPUT`         | Path for log output (`/dev/stdout` by default; set to `/dev/null` to disable logging)                                 | `/tmp/3proxy.log`                 |
 
+## Helm Chart
+
+To install it on Kubernetes (K8s), please use the Helm chart from [ArtifactHUB][artifact-hub].
+
+[artifact-hub]:https://artifacthub.io/packages/helm/proxy-3proxy/proxy-3proxy
+
 ## How to Use This Image
 
 Example usage:
@@ -78,7 +84,7 @@ Example usage:
 docker run --rm -d \
   -p "3128:3128/tcp" \
   -p "1080:1080/tcp" \
-  ghcr.io/tarampampam/3proxy:latest
+  ghcr.io/tarampampam/3proxy:1
 ```
 
 With authentication and custom resolver settings:
@@ -90,7 +96,7 @@ docker run --rm -d \
   -e "PROXY_LOGIN=evil" \
   -e "PROXY_PASSWORD=live" \
   -e "PRIMARY_RESOLVER=2001:4860:4860::8888" \
-  ghcr.io/tarampampam/3proxy:latest
+  ghcr.io/tarampampam/3proxy:1
 ```
 
 Docker compose example:
@@ -98,7 +104,7 @@ Docker compose example:
 ```yaml
 services:
   3proxy:
-    image: ghcr.io/tarampampam/3proxy:latest
+    image: ghcr.io/tarampampam/3proxy:1
     environment:
       PROXY_LOGIN: evil
       PROXY_PASSWORD: live
@@ -142,4 +148,4 @@ This project is licensed under the WTFPL. Use it freely and enjoy!
 [link_docker_tags]:https://hub.docker.com/r/tarampampam/3proxy/tags
 [link_docker_hub]:https://hub.docker.com/r/tarampampam/3proxy/
 [link_ghcr]:https://github.com/tarampampam/3proxy-docker/pkgs/container/3proxy
-[link_3proxy]:https://github.com/z3APA3A/3proxy
+[link_3proxy]:https://github.com/3proxy/3proxy

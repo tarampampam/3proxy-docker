@@ -1,0 +1,149 @@
+# -- The name of the Helm release
+fullnameOverride: null
+# -- This is to override the chart name
+nameOverride: null
+# -- Override the default Release Namespace for Helm
+namespaceOverride: null
+
+image:
+  # -- The image repository to pull from
+  repository: ghcr.io/tarampampam/3proxy
+  # -- Defines the image pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion
+  tag: null
+
+deployment:
+  # -- Enable deployment
+  enabled: true
+  # -- The deployment kind
+  kind: Deployment
+  # -- How many replicas to run
+  replicas: 1
+  # -- Additional pod annotations (e.g. for mesh injection or prometheus scraping)
+  #    It supports templating. One can set it with values like some/name: '{{ template "some.name" . }}'
+  #    For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  podAnnotations: {} # supports templating
+  # -- Additional deployment labels (e.g. for filtering deployment by custom labels)
+  labels: {} # supports templating
+  # -- This is for the secretes for pulling an image from a private repository more information can be found
+  #    here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  imagePullSecrets: [] # supports templating
+  # -- Security context for the pod, more information can be found here:
+  #    https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-1
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001  # as defined in the Dockerfile
+    runAsGroup: 10001 # as defined in the Dockerfile
+  probe:
+    # -- The port to probe (containerPort, "http" or "socks")
+    port: http
+    # -- How often (in seconds) to perform the probe
+    interval: 10
+    # -- Number of seconds after the container has started before liveness probes are initiated
+    initialDelay: 2
+  # -- Resource limits and requests, more information can be found here:
+  #    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    requests: {memory: 16Mi}
+    limits: {memory: 128Mi}
+  # -- Additional volumes to add to the pod, more information can be found here:
+  #    https://kubernetes.io/docs/concepts/storage/volumes/
+  volumes: [] # supports templating
+  # -- Additional volumeMounts to add to the container (for instance when using fs storage driver)
+  volumeMounts: [] # supports templating
+  # -- Node selector for pod assignment, more information can be found here:
+  #    https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  nodeSelector: {} # supports templating
+  # -- Affinity for pod assignment, more information can be found here:
+  #    https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  affinity: {} # supports templating
+  # -- Tolerations for pod assignment, more information can be found here:
+  #    https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: [] # supports templating
+  # -- The list of additional environment variables to set in the container
+  env: [] # supports templating
+  # -- The list of additional arguments to pass to the container
+  args: [] # supports templating
+
+service:
+  # -- Enable service
+  enabled: true
+  # -- Sets the service type more information can be found here:
+  #    https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # -- External name for the service (for type=ExternalName)
+  externalName: null
+  # -- Sets the port, more information can be found here:
+  #    https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  ports:
+    # -- The port number for the proxy to listen on
+    http: 3128
+    # -- The same, but for socks proxy
+    socks: 1080
+
+config:
+  log:
+    # -- Enable logging (set to false to disable)
+    enabled: true
+    # -- The output log file
+    # @default /dev/stdout
+    output: null
+
+  auth:
+    login:
+      # -- Username (login) for proxy authentication, provided as a plain value
+      plain: null
+      fromSecret:
+        # -- Enable getting the username from a secret
+        enabled: false
+        secretName: null # supports templating
+        secretKey: null  # supports templating
+      fromConfigMap:
+        # -- Enable getting the username from a config map
+        enabled: false
+        configMapName: null # supports templating
+        configMapKey: null  # supports templating
+    password:
+      # -- Password for proxy authentication, provided as a plain value
+      plain: null
+      fromSecret:
+        # -- Enable getting the password from a secret
+        enabled: false
+        secretName: null # supports templating
+        secretKey: null  # supports templating
+      fromConfigMap:
+        # -- Enable getting the password from a config map
+        enabled: false
+        configMapName: null # supports templating
+        configMapKey: null  # supports templating
+    extraAccounts:
+      # -- The list of additional accounts to add to the configuration (a hashmap of username:password)
+      plain: {}
+      fromSecret:
+        # -- Enable getting the extra accounts from a secret (the value should be a JSON object)
+        enabled: false
+        secretName: null # supports templating
+        secretKey: null  # supports templating
+      fromConfigMap:
+        # -- Enable getting the extra accounts from a config map (the value should be a JSON object)
+        enabled: false
+        configMapName: null # supports templating
+        configMapKey: null  # supports templating
+
+  dns:
+    # -- Primary DNS server
+    # @default 1.0.0.1 (Cloudflare)
+    primaryResolver: null
+    # -- Secondary DNS server
+    # @default 8.8.4.4 (Google)
+    secondaryResolver: null
+
+  limits:
+    # -- The maximum number of connections
+    # @default 1024
+    maxConnections: null
+
+  # -- Additional 3proxy configuration (appended to the end of the config file, but before `proxy` and `flush`),
+  #    new lines should be separated by `\n`, i.e.: "# line 1\n# line 2"
+  extraConfig: null

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://json.schemastore.org/chart.json
+
+apiVersion: v2
+name: proxy-3proxy
+description: Powerful and lightweight proxy server, written in pure C
+
+type: application
+version: 0.0.0 # will be replaced by the release workflow
+appVersion: 0.0.0 # will be replaced by the release workflow
+icon: https://github.com/user-attachments/assets/023186cf-b153-459c-8417-038fd87a2065
+home: https://github.com/3proxy/3proxy
+sources: [https://github.com/tarampampam/3proxy-docker]
+keywords: [proxy, 3proxy, http, socks]

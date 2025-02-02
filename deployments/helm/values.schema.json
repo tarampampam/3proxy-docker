@@ -1,0 +1,367 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "nameOverride": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "fullnameOverride": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "namespaceOverride": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "tag": {
+          "oneOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        },
+        "pullPolicy": {
+          "oneOf": [
+            {"type": "string", "enum": ["Always", "IfNotPresent", "Never"]},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "kind": {"type": "string"},
+        "replicas": {"type": "integer"},
+        "podAnnotations": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "imagePullSecrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"}
+            },
+            "minProperties": 1
+          }
+        },
+        "securityContext": {
+          "type": "object",
+          "properties": {
+            "runAsNonRoot": {"type": "boolean"},
+            "runAsUser": {"type": "integer"},
+            "runAsGroup": {"type": "integer"}
+          }
+        },
+        "probe": {
+          "type": "object",
+          "properties": {
+            "port": {"type": "string", "enum": ["http", "socks"]},
+            "interval": {"type": "integer"},
+            "initialDelay": {"type": "integer"}
+          }
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": {"type": "string"},
+                "memory": {"type": "string"}
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": {"type": "string"},
+                "memory": {"type": "string"}
+              }
+            }
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "configMap": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"}
+                }
+              },
+              "secret": {
+                "type": "object",
+                "properties": {
+                  "secretName": {"type": "string"}
+                }
+              },
+              "persistentVolumeClaim": {
+                "type": "object",
+                "properties": {
+                  "claimName": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "volumeMounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "mountPath": {"type": "string"},
+              "subPath": {"type": "string"},
+              "readOnly": {"type": "boolean"}
+            }
+          }
+        },
+        "nodeSelector": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "affinity": {
+          "type": "object",
+          "properties": {
+            "nodeAffinity": {"type": "object"},
+            "podAffinity": {"type": "object"},
+            "podAntiAffinity": {"type": "object"}
+          }
+        },
+        "tolerations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {"type": "string"},
+              "operator": {"type": "string"},
+              "value": {"type": "string"},
+              "effect": {"type": "string"}
+            }
+          }
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "value": {"type": "string"},
+              "valueFrom": {"type": "object"}
+            }
+          }
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "type": {
+          "type": "string",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
+        },
+        "externalName": {
+          "oneOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        },
+        "ports": {
+          "type": "object",
+          "properties": {
+            "http": {"type": "integer", "minimum": 1, "maximum": 65535},
+            "socks": {"type": "integer", "minimum": 1, "maximum": 65535}
+          }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "className": {
+          "oneOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {"type": "string", "minLength": 1},
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {"type": "string", "minLength": 1},
+                    "pathType": {"type": "string", "minLength": 1}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "hosts": {"type": "array"},
+              "secretName": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "log": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "output": {
+              "oneOf": [
+                {"type": "string", "minLength": 2, "examples": ["/dev/stdout"]},
+                {"type": "null"}
+              ]
+            }
+          }
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "login": {
+              "type": "object",
+              "properties": {
+                "plain": {
+                  "oneOf": [
+                    {"type": "string", "minLength": 1},
+                    {"type": "null"}
+                  ]
+                },
+                "fromSecret": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "secretName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "secretKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                },
+                "fromConfigMap": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "configMapName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "configMapKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                }
+              }
+            },
+            "password": {
+              "type": "object",
+              "properties": {
+                "plain": {
+                  "oneOf": [
+                    {"type": "string", "minLength": 1},
+                    {"type": "null"}
+                  ]
+                },
+                "fromSecret": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "secretName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "secretKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                },
+                "fromConfigMap": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "configMapName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "configMapKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                }
+              }
+            },
+            "extraAccounts": {
+              "type": "object",
+              "properties": {
+                "plain": {
+                  "type": "object",
+                  "additionalProperties": {"type": "string", "minLength": 1}
+                },
+                "fromSecret": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "secretName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "secretKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                },
+                "fromConfigMap": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "configMapName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "configMapKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "dns": {
+          "type": "object",
+          "properties": {
+            "primaryResolver": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+            "secondaryResolver": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "maxConnections": {"oneOf": [{"type": "integer", "minimum": 1}, {"type": "null"}]}
+          }
+        },
+        "extraConfig": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+      }
+    }
+  }
+}
