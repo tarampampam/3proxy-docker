@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM gcc:13.3.0 AS builder
+FROM docker.io/library/gcc:13.3.0 AS builder
 
 # renovate: source=github-tags name=3proxy/3proxy
 ARG Z3PROXY_VERSION=0.9.4
@@ -37,7 +37,7 @@ RUN set -x \
     && strip ./bin/SSLPlugin.ld.so
 
 # Prepare filesystem for 3proxy running
-FROM alpine:latest AS buffer
+FROM docker.io/library/alpine:latest AS buffer
 
 # create a directory for the future root filesystem
 WORKDIR /tmp/rootfs
@@ -63,7 +63,7 @@ COPY 3proxy.cfg.mustach ./etc/3proxy/3proxy.cfg.mustach
 RUN chown -R 10001:10001 ./etc/3proxy
 
 # Merge into a single layer
-FROM busybox:stable-glibc
+FROM docker.io/library/busybox:stable-glibc
 
 LABEL \
     org.opencontainers.image.title="3proxy" \
