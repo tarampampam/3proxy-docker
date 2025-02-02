@@ -2,7 +2,7 @@
 
 apiVersion: v2
 name: proxy-3proxy
-description: Tiny free proxy server
+description: Powerful and lightweight proxy server, written in pure C
 
 type: application
 version: 0.0.0 # will be replaced by the release workflow

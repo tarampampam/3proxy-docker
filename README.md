@@ -70,6 +70,12 @@ Image: ghcr.io/tarampampam/3proxy:1.8.2
 | `EXTRA_CONFIG`       | Additional 3proxy configuration (appended to the **end** of the config file, but before `proxy` and `flush`)          | `# line 1\n# line 2`              |
 | `LOG_OUTPUT`         | Path for log output (`/dev/stdout` by default; set to `/dev/null` to disable logging)                                 | `/tmp/3proxy.log`                 |
 
+## Helm Chart
+
+To install it on Kubernetes (K8s), please use the Helm chart from [ArtifactHUB][artifact-hub].
+
+[artifact-hub]:https://artifacthub.io/packages/helm/proxy-3proxy/proxy-3proxy
+
 ## How to Use This Image
 
 Example usage:

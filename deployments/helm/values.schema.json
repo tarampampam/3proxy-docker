@@ -42,6 +42,7 @@
       "type": "object",
       "properties": {
         "enabled": {"type": "boolean"},
+        "kind": {"type": "string"},
         "replicas": {"type": "integer"},
         "podAnnotations": {
           "type": "object",
@@ -72,6 +73,7 @@
         "probe": {
           "type": "object",
           "properties": {
+            "port": {"type": "string", "enum": ["http", "socks"]},
             "interval": {"type": "integer"},
             "initialDelay": {"type": "integer"}
           }
@@ -192,7 +194,13 @@
             {"type": "null"}
           ]
         },
-        "port": {"type": "integer", "minimum": 1, "maximum": 65535}
+        "ports": {
+          "type": "object",
+          "properties": {
+            "http": {"type": "integer", "minimum": 1, "maximum": 65535},
+            "socks": {"type": "integer", "minimum": 1, "maximum": 65535}
+          }
+        }
       }
     },
     "ingress": {
@@ -240,6 +248,120 @@
         }
       }
     },
-    "config": {}
+    "config": {
+      "type": "object",
+      "properties": {
+        "log": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "output": {
+              "oneOf": [
+                {"type": "string", "minLength": 2, "examples": ["/dev/stdout"]},
+                {"type": "null"}
+              ]
+            }
+          }
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "login": {
+              "type": "object",
+              "properties": {
+                "plain": {
+                  "oneOf": [
+                    {"type": "string", "minLength": 1},
+                    {"type": "null"}
+                  ]
+                },
+                "fromSecret": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "secretName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "secretKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                },
+                "fromConfigMap": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "configMapName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "configMapKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                }
+              }
+            },
+            "password": {
+              "type": "object",
+              "properties": {
+                "plain": {
+                  "oneOf": [
+                    {"type": "string", "minLength": 1},
+                    {"type": "null"}
+                  ]
+                },
+                "fromSecret": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "secretName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "secretKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                },
+                "fromConfigMap": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "configMapName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "configMapKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                }
+              }
+            },
+            "extraAccounts": {
+              "type": "object",
+              "properties": {
+                "plain": {
+                  "type": "object",
+                  "additionalProperties": {"type": "string", "minLength": 1}
+                },
+                "fromSecret": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "secretName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "secretKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                },
+                "fromConfigMap": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {"type": "boolean"},
+                    "configMapName": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+                    "configMapKey": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "dns": {
+          "type": "object",
+          "properties": {
+            "primaryResolver": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+            "secondaryResolver": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "maxConnections": {"oneOf": [{"type": "integer", "minimum": 1}, {"type": "null"}]}
+          }
+        },
+        "extraConfig": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+      }
+    }
   }
 }

@@ -17,7 +17,7 @@ deployment:
   # -- Enable deployment
   enabled: true
   # -- The deployment kind
-  kind: Deployment # TODO: add into schema
+  kind: Deployment
   # -- How many replicas to run
   replicas: 1
   # -- Additional pod annotations (e.g. for mesh injection or prometheus scraping)
@@ -36,7 +36,8 @@ deployment:
     runAsUser: 10001  # as defined in the Dockerfile
     runAsGroup: 10001 # as defined in the Dockerfile
   probe:
-    port: http # or socks # TODO: add into schema
+    # -- The port to probe (containerPort, "http" or "socks")
+    port: http
     # -- How often (in seconds) to perform the probe
     interval: 10
     # -- Number of seconds after the container has started before liveness probes are initiated
@@ -75,7 +76,7 @@ service:
   externalName: null
   # -- Sets the port, more information can be found here:
   #    https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  ports: # TODO: add into schema
+  ports:
     # -- The port number for the proxy to listen on
     http: 3128
     # -- The same, but for socks proxy
