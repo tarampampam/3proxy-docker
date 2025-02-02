@@ -22,7 +22,7 @@ Alternatively, add the following lines to your `Chart.yaml`:
 dependencies:
   - name: proxy-3proxy
     version: <version_here>
-    repository: https://tarampampam.github.io/proxy-3proxy/helm-charts
+    repository: https://tarampampam.github.io/3proxy-docker/helm-charts
 ```
 
 And override the default values in your `values.yaml`:
