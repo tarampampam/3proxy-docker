@@ -68,7 +68,8 @@ jobs:
           push: false
           platforms: linux/amd64,linux/arm64
           tags: 3proxy:local
-      - run: docker image ls -la
+      - run: docker images --all
+      - run: docker image ls -a
       - run: docker save 3proxy:local > ./docker-image.tar
       - uses: actions/upload-artifact@v4
         with:
