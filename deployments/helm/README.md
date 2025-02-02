@@ -10,10 +10,10 @@ Also, this chart does not include Ingress configuration. If you need it, please,
 ## Usage
 
 ```shell
-helm repo add tarampampam https://tarampampam.github.io/3proxy-docker/helm-charts
+helm repo add proxy-3proxy https://tarampampam.github.io/3proxy-docker/helm-charts
 helm repo update
 
-helm install proxy-3proxy tarampampam/proxy-3proxy
+helm install my-3proxy proxy-3proxy/proxy-3proxy --version <version_here>
 ```
 
 Alternatively, add the following lines to your `Chart.yaml`:
@@ -21,7 +21,7 @@ Alternatively, add the following lines to your `Chart.yaml`:
 ```yaml
 dependencies:
   - name: proxy-3proxy
-    version: <version>
+    version: <version_here>
     repository: https://tarampampam.github.io/proxy-3proxy/helm-charts
 ```
 

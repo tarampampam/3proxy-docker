@@ -84,7 +84,7 @@ Example usage:
 docker run --rm -d \
   -p "3128:3128/tcp" \
   -p "1080:1080/tcp" \
-  ghcr.io/tarampampam/3proxy:latest
+  ghcr.io/tarampampam/3proxy:1
 ```
 
 With authentication and custom resolver settings:
@@ -96,7 +96,7 @@ docker run --rm -d \
   -e "PROXY_LOGIN=evil" \
   -e "PROXY_PASSWORD=live" \
   -e "PRIMARY_RESOLVER=2001:4860:4860::8888" \
-  ghcr.io/tarampampam/3proxy:latest
+  ghcr.io/tarampampam/3proxy:1
 ```
 
 Docker compose example:
@@ -104,7 +104,7 @@ Docker compose example:
 ```yaml
 services:
   3proxy:
-    image: ghcr.io/tarampampam/3proxy:latest
+    image: ghcr.io/tarampampam/3proxy:1
     environment:
       PROXY_LOGIN: evil
       PROXY_PASSWORD: live
@@ -148,4 +148,4 @@ This project is licensed under the WTFPL. Use it freely and enjoy!
 [link_docker_tags]:https://hub.docker.com/r/tarampampam/3proxy/tags
 [link_docker_hub]:https://hub.docker.com/r/tarampampam/3proxy/
 [link_ghcr]:https://github.com/tarampampam/3proxy-docker/pkgs/container/3proxy
-[link_3proxy]:https://github.com/z3APA3A/3proxy
+[link_3proxy]:https://github.com/3proxy/3proxy
