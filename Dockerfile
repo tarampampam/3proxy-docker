@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM gcc:13.3.0 AS builder
+FROM docker.io/library/gcc:13.3.0 AS builder
 
 # renovate: source=github-tags name=3proxy/3proxy
 ARG Z3PROXY_VERSION=0.9.4
@@ -34,10 +34,11 @@ RUN set -x \
     && strip ./bin/TrafficPlugin.ld.so \
     && strip ./bin/PCREPlugin.ld.so \
     && strip ./bin/TransparentPlugin.ld.so \
-    && strip ./bin/SSLPlugin.ld.so
+    && strip ./bin/SSLPlugin.ld.so \
+    && cp /lib/$(gcc -dumpmachine)/libdl.so.* /tmp/3proxy/
 
 # Prepare filesystem for 3proxy running
-FROM alpine:latest AS buffer
+FROM docker.io/library/alpine:latest AS buffer
 
 # create a directory for the future root filesystem
 WORKDIR /tmp/rootfs
@@ -53,7 +54,7 @@ RUN set -x \
     && chmod +x ./bin/dumb-init \
     && apk del .build-deps
 
-COPY --from=builder /lib/*-linux-gnu/libdl.so.* ./lib/
+COPY --from=builder /tmp/3proxy/libdl.so.* ./lib/
 COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
 COPY --from=builder /tmp/3proxy/bin/*.ld.so ./usr/local/3proxy/libexec/
 COPY --from=ghcr.io/tarampampam/mustpl:0.1.1 /bin/mustpl ./bin/mustpl
@@ -63,7 +64,7 @@ COPY 3proxy.cfg.mustach ./etc/3proxy/3proxy.cfg.mustach
 RUN chown -R 10001:10001 ./etc/3proxy
 
 # Merge into a single layer
-FROM busybox:stable-glibc
+FROM docker.io/library/busybox:stable-glibc
 
 LABEL \
     org.opencontainers.image.title="3proxy" \
