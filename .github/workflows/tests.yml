@@ -40,15 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-      - run: docker build --platform linux/amd64,linux/arm64 -t 3proxy:local --load .
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          tags: 3proxy:local
-          outputs: type=oci,dest=./docker-image.tar
+      - run: docker build -f ./Dockerfile --tag 3proxy:local .
+      - run: docker save 3proxy:local > ./docker-image.tar
       - uses: actions/upload-artifact@v4
         with:
           name: docker-image
@@ -56,7 +49,7 @@ jobs:
           retention-days: 1
 
   try-to-use:
-    name: Build and use the docker image (auth ${{ matrix.auth }})
+    name: Try to use the docker image (auth ${{ matrix.auth }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -68,9 +61,8 @@ jobs:
         with:
           name: docker-image
           path: .artifact
-      - run: docker import docker-image.tar
-        working-directory: .artifact
-      - run: docker images --all
+      - working-directory: .artifact
+        run: docker load < docker-image.tar
       - if: matrix.auth != 'yes'
         run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" 3proxy:local
       - if: matrix.auth == 'yes'
