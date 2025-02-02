@@ -1,0 +1,194 @@
+{{- if .Values.deployment.enabled }}
+apiVersion: apps/v1
+kind: {{ .Values.deployment.kind | default "Deployment" }}
+
+metadata:
+  name: {{ include "proxy-3proxy.fullname" . }}
+  namespace: {{ template "proxy-3proxy.namespace" . }}
+  labels:
+    {{- include "proxy-3proxy.commonLabels" . | nindent 4 }}
+
+spec:
+  {{- with .Values.deployment }}
+  replicas: {{ .replicas | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "proxy-3proxy.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      {{- with .podAnnotations }}
+      annotations:
+        {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "proxy-3proxy.commonLabels" $ | nindent 8 }}
+        {{- with .labels }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .imagePullSecrets }}
+      imagePullSecrets:
+        {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "proxy-3proxy.fullname" $ }}
+
+          {{- with .securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+            readOnlyRootFilesystem: false
+          {{- end }}
+
+          {{- with $.Values.image }}
+          image: "{{ .repository }}:{{ .tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 3128
+              protocol: TCP
+            - name: socks
+              containerPort: 1080
+              protocol: TCP
+          env:
+            - {name: PROXY_PORT, value: "3128"}
+            - {name: SOCKS_PORT, value: "1080"}
+          {{- with $.Values.config }}
+            {{- with .log }}
+            {{- $logOutputEnvName := "LOG_OUTPUT" }}
+            {{- if eq .enabled false }}
+            - {name: {{ $logOutputEnvName }}, value: "/dev/null"}
+            {{- else if .output }}
+            - {name: {{ $logOutputEnvName }}, value: "{{ .output }}"}
+            {{- end }}
+            {{- end }}
+
+            {{- with .auth.login }}
+            {{- $authLoginEnvName := "PROXY_LOGIN" }}
+            {{- if .plain }}
+            - {name: {{ $authLoginEnvName }}, value: "{{ .plain }}"}
+            {{- else if .fromSecret.enabled }}
+            - name: {{ $authLoginEnvName }}
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ tpl (toYaml .fromSecret.secretName) $ }}"
+                  key: "{{ tpl (toYaml .fromSecret.secretKey) $ }}"
+            {{- else if .fromConfigMap.enabled }}
+            - name: {{ $authLoginEnvName }}
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ tpl (toYaml .fromConfigMap.configMapName) $ }}"
+                  key: "{{ tpl (toYaml .fromConfigMap.configMapKey) $ }}"
+            {{- end }}
+            {{- end }}
+
+            {{- with .auth.password }}
+            {{- $authPasswordEnvName := "PROXY_PASSWORD" }}
+            {{- if .plain }}
+            - {name: {{ $authPasswordEnvName }}, value: "{{ .plain }}"}
+            {{- else if .fromSecret.enabled }}
+            - name: {{ $authPasswordEnvName }}
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ tpl (toYaml .fromSecret.secretName) $ }}"
+                  key: "{{ tpl (toYaml .fromSecret.secretKey) $ }}"
+            {{- else if .fromConfigMap.enabled }}
+            - name: {{ $authPasswordEnvName }}
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ tpl (toYaml .fromConfigMap.configMapName) $ }}"
+                  key: "{{ tpl (toYaml .fromConfigMap.configMapKey) $ }}"
+            {{- end }}
+            {{- end }}
+
+            {{- with .auth.extraAccounts }}
+            {{- $extraAuthAccountsEnvName := "EXTRA_ACCOUNTS" }}
+            {{- if .plain }}
+            - name: {{ $extraAuthAccountsEnvName }}
+              value: >-
+                {{ .plain | toJson }}
+            {{- else if .fromSecret.enabled }}
+            - name: {{ $extraAuthAccountsEnvName }}
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ tpl (toYaml .fromSecret.secretName) $ }}"
+                  key: "{{ tpl (toYaml .fromSecret.secretKey) $ }}"
+            {{- else if .fromConfigMap.enabled }}
+            - name: {{ $extraAuthAccountsEnvName }}
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ tpl (toYaml .fromConfigMap.configMapName) $ }}"
+                  key: "{{ tpl (toYaml .fromConfigMap.configMapKey) $ }}"
+            {{- end }}
+            {{- end }}
+
+            {{- if .dns.primaryResolver }}
+            - {name: PRIMARY_RESOLVER, value: "{{ .dns.primaryResolver }}"}
+            {{- end }}
+
+            {{- if .dns.secondaryResolver }}
+            - {name: SECONDARY_RESOLVER, value: "{{ .dns.secondaryResolver }}"}
+            {{- end }}
+
+            {{- if ne .limits.maxConnections nil }}
+            - {name: MAX_CONNECTIONS, value: "{{ .limits.maxConnections }}"}
+            {{- end }}
+
+            {{- if .extraConfig }}
+            - name: EXTRA_CONFIG
+              value: >-
+                {{ .extraConfig }}
+            {{- end }}
+            {{- with $.Values.deployment.env }}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+          {{- end }}
+
+          {{- with .args }}
+          args:
+            {{- tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+
+          {{- with .probe }}
+          livenessProbe:
+            tcpSocket: {port: "{{ .port }}"}
+            periodSeconds: {{ .interval }}
+            initialDelaySeconds: {{ .initialDelay }}
+          readinessProbe:
+            tcpSocket: {port: "{{ .port }}"}
+            periodSeconds: {{ .interval }}
+            initialDelaySeconds: {{ .initialDelay }}
+          {{- end }}
+
+          {{- with .resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .volumeMounts }}
+          volumeMounts:
+            {{- tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+
+      {{- with .volumes }}
+      volumes:
+        {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+
+      {{- with .affinity }}
+      affinity:
+        {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+
+      {{- with .tolerations }}
+      tolerations:
+        {{- tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end }}

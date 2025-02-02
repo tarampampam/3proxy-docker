@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://json.schemastore.org/chart.json
+
+apiVersion: v2
+name: proxy-3proxy
+description: Tiny free proxy server
+
+type: application
+version: 0.0.0 # will be replaced by the release workflow
+appVersion: 0.0.0 # will be replaced by the release workflow
+icon: https://github.com/user-attachments/assets/023186cf-b153-459c-8417-038fd87a2065
+sources: [https://github.com/tarampampam/3proxy-docker]

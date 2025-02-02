@@ -1,0 +1,29 @@
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{ include "proxy-3proxy.fullname" . }}
+  namespace: {{ template "proxy-3proxy.namespace" . }}
+  labels:
+    {{- include "proxy-3proxy.commonLabels" . | nindent 4 }}
+
+spec:
+  {{- with .Values.service }}
+  type: {{ .type }}
+  {{- with .externalName }}
+  externalName: {{ . }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ .ports.http }}
+      targetPort: http
+      protocol: TCP
+    - name: http
+      port: {{ .ports.socks }}
+      targetPort: socks
+      protocol: TCP
+  selector:
+    {{- include "proxy-3proxy.selectorLabels" $ | nindent 4 }}
+  {{- end }}
+{{- end }}
