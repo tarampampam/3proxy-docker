@@ -69,6 +69,7 @@ jobs:
           path: .artifact
       - working-directory: .artifact
         run: docker import docker-image.tar
+      - run: docker images --all
       - if: matrix.auth != 'yes'
         run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" 3proxy:local
       - if: matrix.auth == 'yes'
