@@ -3,9 +3,9 @@ entries:
   proxy-3proxy:
   - apiVersion: v2
     appVersion: 1.11.0
-    created: "2025-02-02T12:59:02.429767206Z"
+    created: "2025-02-02T13:40:35.954152346Z"
     description: Powerful and lightweight proxy server, written in pure C
-    digest: c089c63f16cdbf1de8ba2f12ec98313935c29cfdb414e9af73aaa13c6f33293d
+    digest: 3d63ce7bdc724821288e79ce33dba2151179c7eed8c8e4d925d2510385018921
     home: https://github.com/3proxy/3proxy
     icon: https://github.com/user-attachments/assets/023186cf-b153-459c-8417-038fd87a2065
     keywords:
@@ -22,7 +22,7 @@ entries:
     version: 1.11.0
   - apiVersion: v2
     appVersion: 1.11.0-rc2
-    created: "2025-02-02T12:59:02.429254741Z"
+    created: "2025-02-02T13:40:35.953665193Z"
     description: Powerful and lightweight proxy server, written in pure C
     digest: a72c75287756edac2fa714fec47f61aa367b8ba72ce7a2dc342fc7f0eb4796b8
     home: https://github.com/3proxy/3proxy
@@ -41,7 +41,7 @@ entries:
     version: 1.11.0-rc2
   - apiVersion: v2
     appVersion: 1.11.0-rc1
-    created: "2025-02-02T12:59:02.428753468Z"
+    created: "2025-02-02T13:40:35.952970222Z"
     description: Powerful and lightweight proxy server, written in pure C
     digest: 1cf9495476a0382c8a79f249042fad8a52304cc54c717a095460ef0c204cc055
     icon: https://github.com/user-attachments/assets/023186cf-b153-459c-8417-038fd87a2065
@@ -52,4 +52,4 @@ entries:
     urls:
     - https://tarampampam.github.io/3proxy-docker/helm-charts/proxy-3proxy-1.11.0-rc1.tgz
     version: 1.11.0-rc1
-generated: "2025-02-02T12:59:02.428136979Z"
+generated: "2025-02-02T13:40:35.952303062Z"
