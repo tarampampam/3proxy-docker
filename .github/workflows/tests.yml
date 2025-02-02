@@ -42,6 +42,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
+      - run: docker build buildx --platform linux/amd64,linux/arm64 -t 3proxy:local .
       - uses: docker/build-push-action@v6
         with:
           context: .
@@ -67,8 +68,8 @@ jobs:
         with:
           name: docker-image
           path: .artifact
-      - working-directory: .artifact
-        run: docker import docker-image.tar
+      - run: docker import docker-image.tar
+        working-directory: .artifact
       - run: docker images --all
       - if: matrix.auth != 'yes'
         run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" 3proxy:local
