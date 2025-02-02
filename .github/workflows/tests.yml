@@ -47,7 +47,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           tags: 3proxy:local
-          outputs: type=docker,dest=./docker-image.tar
+          outputs: type=oci,dest=./docker-image.tar
       - uses: actions/upload-artifact@v4
         with:
           name: docker-image
