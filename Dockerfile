@@ -2,19 +2,19 @@
 
 FROM gcc:13.3.0 AS builder
 
-# renovate: source=github-tags name=z3APA3A/3proxy
+# renovate: source=github-tags name=3proxy/3proxy
 ARG Z3PROXY_VERSION=0.9.4
 
 # Fetch 3proxy sources
 RUN set -x \
-    && git -c advice.detachedHead=false clone --depth 1 --branch "${Z3PROXY_VERSION}" https://github.com/z3APA3A/3proxy.git /tmp/3proxy
+    && git -c advice.detachedHead=false clone --depth 1 --branch "${Z3PROXY_VERSION}" https://github.com/3proxy/3proxy.git /tmp/3proxy
 
 WORKDIR /tmp/3proxy
 
 # Patch sources
 RUN set -x \
     && echo '#define ANONYMOUS 1' >> ./src/3proxy.h \
-    # proxy.c source: <https://github.com/z3APA3A/3proxy/blob/0.9.3/src/proxy.c>
+    # proxy.c source: <https://github.com/3proxy/3proxy/blob/0.9.3/src/proxy.c>
     && sed -i 's~\(<\/head>\)~<style>:root{--color-bg-primary:#fff;--color-text-primary:#131313;--color-text-secondary:#232323}\
 @media (prefers-color-scheme: dark){:root{--color-bg-primary:#212121;--color-text-primary:#fafafa;--color-text-secondary:#bbb}}\
 html,body{height:100%;font-family:sans-serif;background-color:var(--color-bg-primary);color:var(--color-text-primary);margin:0;\

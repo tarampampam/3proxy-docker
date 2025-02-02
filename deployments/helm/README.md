@@ -30,6 +30,6 @@ And override the default values in your `values.yaml`:
 ```yaml
 proxy-3proxy:
   # ...
-  service: {port: 8800}
+  service: {ports: {http: 3128}}
   # ...
 ```
