@@ -35,7 +35,7 @@ RUN set -x \
     && strip ./bin/PCREPlugin.ld.so \
     && strip ./bin/TransparentPlugin.ld.so \
     && strip ./bin/SSLPlugin.ld.so \
-    && cp "/lib/$(gcc -dumpmachine)"/libdl.so.* /tmp/3proxy/
+    && cp /lib/$(gcc -dumpmachine)/libdl.so.* /tmp/3proxy/
 
 # Prepare filesystem for 3proxy running
 FROM docker.io/library/alpine:latest AS buffer
