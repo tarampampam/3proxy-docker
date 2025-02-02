@@ -19,7 +19,7 @@ spec:
       port: {{ .ports.http }}
       targetPort: http
       protocol: TCP
-    - name: http
+    - name: socks
       port: {{ .ports.socks }}
       targetPort: socks
       protocol: TCP
