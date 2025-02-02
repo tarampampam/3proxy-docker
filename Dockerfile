@@ -34,7 +34,8 @@ RUN set -x \
     && strip ./bin/TrafficPlugin.ld.so \
     && strip ./bin/PCREPlugin.ld.so \
     && strip ./bin/TransparentPlugin.ld.so \
-    && strip ./bin/SSLPlugin.ld.so
+    && strip ./bin/SSLPlugin.ld.so \
+    && cp "/lib/$(gcc -dumpmachine)"/libdl.so.* /tmp/3proxy/
 
 # Prepare filesystem for 3proxy running
 FROM docker.io/library/alpine:latest AS buffer
@@ -53,7 +54,7 @@ RUN set -x \
     && chmod +x ./bin/dumb-init \
     && apk del .build-deps
 
-COPY --from=builder /lib/*-linux-gnu/libdl.so.* ./lib/
+COPY --from=builder /tmp/3proxy/libdl.so.* ./lib/
 COPY --from=builder /tmp/3proxy/bin/3proxy ./bin/3proxy
 COPY --from=builder /tmp/3proxy/bin/*.ld.so ./usr/local/3proxy/libexec/
 COPY --from=ghcr.io/tarampampam/mustpl:0.1.1 /bin/mustpl ./bin/mustpl
