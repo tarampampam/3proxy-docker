@@ -72,14 +72,14 @@ spec:
             - name: {{ $authLoginEnvName }}
               valueFrom:
                 secretKeyRef:
-                  name: "{{ tpl (toYaml .fromSecret.secretName) $ }}"
-                  key: "{{ tpl (toYaml .fromSecret.secretKey) $ }}"
+                  name: {{ tpl .fromSecret.secretName $ | quote }}
+                  key: {{ tpl .fromSecret.secretKey $ | quote }}
             {{- else if .fromConfigMap.enabled }}
             - name: {{ $authLoginEnvName }}
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ tpl (toYaml .fromConfigMap.configMapName) $ }}"
-                  key: "{{ tpl (toYaml .fromConfigMap.configMapKey) $ }}"
+                  name: {{ tpl .fromConfigMap.configMapName $ | quote }}
+                  key: {{ tpl .fromConfigMap.configMapKey $ | quote }}
             {{- end }}
             {{- end }}
 
@@ -91,14 +91,14 @@ spec:
             - name: {{ $authPasswordEnvName }}
               valueFrom:
                 secretKeyRef:
-                  name: "{{ tpl (toYaml .fromSecret.secretName) $ }}"
-                  key: "{{ tpl (toYaml .fromSecret.secretKey) $ }}"
+                  name: {{ tpl .fromSecret.secretName $ | quote }}
+                  key: {{ tpl .fromSecret.secretKey $ | quote }}
             {{- else if .fromConfigMap.enabled }}
             - name: {{ $authPasswordEnvName }}
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ tpl (toYaml .fromConfigMap.configMapName) $ }}"
-                  key: "{{ tpl (toYaml .fromConfigMap.configMapKey) $ }}"
+                  name: {{ tpl .fromConfigMap.configMapName $ | quote }}
+                  key: {{ tpl .fromConfigMap.configMapKey $ | quote }}
             {{- end }}
             {{- end }}
 
@@ -112,14 +112,14 @@ spec:
             - name: {{ $extraAuthAccountsEnvName }}
               valueFrom:
                 secretKeyRef:
-                  name: "{{ tpl (toYaml .fromSecret.secretName) $ }}"
-                  key: "{{ tpl (toYaml .fromSecret.secretKey) $ }}"
+                  name: {{ tpl .fromSecret.secretName $ | quote }}
+                  key: {{ tpl .fromSecret.secretKey $ | quote }}
             {{- else if .fromConfigMap.enabled }}
             - name: {{ $extraAuthAccountsEnvName }}
               valueFrom:
                 configMapKeyRef:
-                  name: "{{ tpl (toYaml .fromConfigMap.configMapName) $ }}"
-                  key: "{{ tpl (toYaml .fromConfigMap.configMapKey) $ }}"
+                  name: {{ tpl .fromConfigMap.configMapName $ | quote }}
+                  key: {{ tpl .fromConfigMap.configMapKey $ | quote }}
             {{- end }}
             {{- end }}
 
