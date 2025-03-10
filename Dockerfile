@@ -3,7 +3,7 @@
 FROM docker.io/library/gcc:13.3.0 AS builder
 
 # renovate: source=github-tags name=3proxy/3proxy
-ARG Z3PROXY_VERSION=0.9.4
+ARG Z3PROXY_VERSION=0.9.5
 
 # Fetch 3proxy sources
 RUN set -x \
