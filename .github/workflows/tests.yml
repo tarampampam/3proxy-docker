@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults: {run: {working-directory: ./deployments/helm}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: azure/setup-helm@v4
       - run: helm dependency update .
       - run: helm template . > /dev/null
@@ -39,7 +39,7 @@ jobs:
     name: Build the docker image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: docker build -f ./Dockerfile --tag 3proxy:local .
       - run: docker save 3proxy:local > ./docker-image.tar
       - uses: actions/upload-artifact@v4
@@ -57,7 +57,7 @@ jobs:
         auth: [yes, no]
     needs: [build-image]
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: docker-image
           path: .artifact
