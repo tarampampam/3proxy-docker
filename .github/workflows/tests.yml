@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@v5
       - run: docker build -f ./Dockerfile --tag 3proxy:local .
       - run: docker save 3proxy:local > ./docker-image.tar
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: docker-image
           path: ./docker-image.tar
@@ -57,7 +57,7 @@ jobs:
         auth: [yes, no]
     needs: [build-image]
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: docker-image
           path: .artifact
