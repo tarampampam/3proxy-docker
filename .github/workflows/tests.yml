@@ -36,13 +36,34 @@ jobs:
       - run: helm lint --strict .
 
   build-image:
-    name: Build the docker image
+    name: Build the docker image (${{ matrix.platform }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm/v6
+          - linux/arm/v7
+          - linux/arm64
+          - linux/ppc64le
+          - linux/s390x
     steps:
       - uses: actions/checkout@v5
-      - run: docker build -f ./Dockerfile --tag 3proxy:local .
-      - run: docker save 3proxy:local > ./docker-image.tar
-      - uses: actions/upload-artifact@v5
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          load: true
+          platforms: ${{ matrix.platform }}
+          tags: 3proxy:local
+      - if: matrix.platform == 'linux/amd64'
+        run: docker save 3proxy:local -o ./docker-image.tar
+      - if: matrix.platform == 'linux/amd64'
+        uses: actions/upload-artifact@v5
         with:
           name: docker-image
           path: ./docker-image.tar

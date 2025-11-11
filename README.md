@@ -45,15 +45,30 @@ All supported image tags can be [found here][link_docker_tags].
 
 > Starting with version 1.8.2, the `arm64` architecture is supported (in addition to `amd64`):
 
-```shell
-docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.8.2
+<details>
+  <summary><strong><code>docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.8.2</code></strong></summary>
 
+```shell
 Image: ghcr.io/tarampampam/3proxy:1.8.2
  * Manifest List: Yes (Image type: application/vnd.docker.distribution.manifest.list.v2+json)
  * Supported platforms:
    - linux/amd64
    - linux/arm64
 ```
+
+</details>
+
+> Starting with version 1.12.1, the following architectures are supported: `arm/v6`, `arm/v7`, `ppc64le`, `s390x`
+> (in addition to `amd64`, `arm64`):
+
+<details>
+  <summary><strong><code>docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.12.1</code></strong></summary>
+
+```shell
+TODO
+```
+
+</details>
 
 ## Supported Environment Variables
 
