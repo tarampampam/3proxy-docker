@@ -65,7 +65,15 @@ Image: ghcr.io/tarampampam/3proxy:1.8.2
   <summary><strong><code>docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.12.1</code></strong></summary>
 
 ```shell
-TODO
+Image: ghcr.io/tarampampam/3proxy:1.12.1
+ * Manifest List: Yes (Image type: application/vnd.oci.image.index.v1+json)
+ * Supported platforms:
+   - linux/amd64
+   - linux/arm/v6
+   - linux/arm/v7
+   - linux/arm64
+   - linux/ppc64le
+   - linux/s390x
 ```
 
 </details>
