@@ -63,7 +63,7 @@ jobs:
       - if: matrix.platform == 'linux/amd64'
         run: docker save 3proxy:local -o ./docker-image.tar
       - if: matrix.platform == 'linux/amd64'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: docker-image
           path: ./docker-image.tar
@@ -78,7 +78,7 @@ jobs:
         auth: [yes, no]
     needs: [build-image]
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: docker-image
           path: .artifact
