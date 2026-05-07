@@ -1,7 +1,6 @@
-/* Fake dlopen/dlsym shim that statically embeds all 3proxy plugins.
- * Zero changes to 3proxy sources - just compile each plugin with
- * -Dstart=<unique_name> to resolve the symbol collision for StringsPlugin
- * and TrafficPlugin (both export "start"). */
+/* Fake dlopen/dlsym shim that statically embeds 3proxy plugins.
+ * StringsPlugin must be compiled with -Dstart=strings_plugin_start to avoid
+ * conflicting with the "start" symbol in the 3proxy binary itself. */
 
 #include <string.h>
 #include <stdint.h>
@@ -10,17 +9,13 @@ struct pluginlink;
 typedef int (*pfn)(struct pluginlink *, int, char **);
 
 int strings_plugin_start(struct pluginlink *, int, char **);
-int traffic_plugin_start(struct pluginlink *, int, char **);
-int transparent_plugin(struct pluginlink *, int, char **);
 int pcre_plugin(struct pluginlink *, int, char **);
 int ssl_plugin(struct pluginlink *, int, char **);
 
 static const struct { const char *path; const char *sym; pfn fn; } _pl[] = {
-    { "StringsPlugin",     "start",              (pfn)strings_plugin_start },
-    { "TrafficPlugin",     "start",              (pfn)traffic_plugin_start  },
-    { "TransparentPlugin", "transparent_plugin", (pfn)transparent_plugin    },
-    { "PCREPlugin",        "pcre_plugin",        (pfn)pcre_plugin           },
-    { "SSLPlugin",         "ssl_plugin",         (pfn)ssl_plugin            },
+    { "StringsPlugin", "start",      (pfn)strings_plugin_start },
+    { "PCREPlugin",    "pcre_plugin", (pfn)pcre_plugin          },
+    { "SSLPlugin",     "ssl_plugin",  (pfn)ssl_plugin           },
     { NULL, NULL, NULL }
 };
 
