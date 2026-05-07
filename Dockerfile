@@ -7,14 +7,14 @@ FROM docker.io/library/alpine:3.23 AS lua
 ARG LUA_VERSION=5.5.0
 
 RUN --mount=type=cache,target=/var/cache/apk \
-    --mount=type=bind,source=/src/lua,target=/mnt/lua-patches \
+    --mount=type=bind,source=/patches/lua,target=/mnt/patches\
     set -x \
     && apk add --cache-dir /var/cache/apk --virtual .build-deps gcc make musl-dev patch \
     && mkdir /tmp/lua \
     && wget -qO- "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz" \
       | tar -xz --strip-components=1 -C /tmp/lua \
     && cd /tmp/lua \
-    && for f in /mnt/lua-patches/*.patch; do patch -p1 < "$f"; done \
+    && for f in /mnt/patches/*.patch; do patch -p1 < "$f"; done \
     && make lua \
       MYCFLAGS="-std=c99 -Os -DLUA_USE_POSIX -ffunction-sections -fdata-sections" \
       MYLDFLAGS="-static -Wl,--gc-sections" \
@@ -66,7 +66,7 @@ ARG THE3PROXY_VERSION=0.9.6
 #   authenticate using client certificates (usage: `plugin SSLPlugin ssl_plugin` + config commands)
 #   docs: https://3proxy.org/plugins/SSLPlugin/
 RUN --mount=type=cache,target=/var/cache/apk  \
-    --mount=type=bind,source=/src,target=/mnt/src \
+    --mount=type=bind,source=/patches/3proxy,target=/mnt/patches \
     set -x \
     && apk add --cache-dir /var/cache/apk ca-certificates \
     && apk add --cache-dir /var/cache/apk --virtual .build-deps \
@@ -81,7 +81,7 @@ RUN --mount=type=cache,target=/var/cache/apk  \
     && echo "COMPATLIBS += static_plugins.o strings_plugin.o pcre_plugin.o ssl_plugin.o my_ssl.o" >> ./Makefile \
     && echo "LIBS = -l:libssl.a -l:libcrypto.a -l:libpcre2-8.a" >> ./Makefile \
     && echo "LDFLAGS += -static" >> ./Makefile \
-    && cp /mnt/src/3proxy/static_plugins.c ./src/static_plugins.c \
+    && cp /mnt/patches/static_plugins.c ./src/static_plugins.c \
     && gcc -c -fPIC -D_GNU_SOURCE -o ./src/static_plugins.o ./src/static_plugins.c \
     && for p in StringsPlugin PCREPlugin SSLPlugin; do cp ./Makefile ./src/plugins/$p/Makefile.var; done \
     && make -C ./src/plugins/StringsPlugin StringsPlugin.o DCFLAGS="-Dstart=strings_plugin_start" \
@@ -99,20 +99,24 @@ RUN --mount=type=cache,target=/var/cache/apk  \
     && mv ./bin/3proxy /bin/3proxy \
     && rm -rf /tmp/3proxy
 
-# prepare the root filesystem
+# -✂- and this stage is used to prepare the root filesystem for the final image ---------------------------------------
+FROM docker.io/library/alpine:3.23 AS rootfs
+
+WORKDIR /tmp/rootfs
 RUN --mount=type=bind,from=lua,source=/bin/lua,target=/mnt/lua \
     --mount=type=bind,from=dumb-init,source=/bin/dumb-init,target=/mnt/dumb-init \
+    --mount=type=bind,from=the3proxy,source=/bin/3proxy,target=/mnt/3proxy \
+    --mount=type=bind,source=/entrypoint.lua,target=/mnt/entrypoint.lua \
     set -x \
-    && mkdir /tmp/rootfs \
-    && cd /tmp/rootfs \
     && mkdir -p ./tmp ./etc ./bin ./etc/3proxy ./etc/ssl/certs \
     && echo '3proxy:x:10001:10001::/nonexistent:/sbin/nologin' > ./etc/passwd \
     && echo '3proxy:x:10001:' > ./etc/group \
     && cp /etc/ssl/certs/ca-certificates.crt ./etc/ssl/certs/ca-certificates.crt \
-    && mv /bin/3proxy ./bin/3proxy \
+    && cp /mnt/3proxy ./bin/3proxy \
     && cp /mnt/lua ./bin/lua \
     && cp /mnt/dumb-init ./bin/dumb-init \
-    && chmod +x ./bin/* \
+    && cp /mnt/entrypoint.lua ./entrypoint.lua \
+    && chmod +x ./bin/* ./entrypoint.lua \
     && chown -R 10001:10001 ./etc/3proxy \
     && chmod 1777 ./tmp
 
@@ -127,9 +131,7 @@ LABEL \
     org.opencontainers.image.vendor="Tarampampam" \
     org.opencontainers.image.licenses="WTFPL"
 
-COPY --from=the3proxy /tmp/rootfs /
+COPY --from=rootfs /tmp/rootfs /
 USER 10001:10001
 
-ENTRYPOINT ["/bin/dumb-init", "--"]
-
-CMD ["/bin/3proxy", "/etc/3proxy/3proxy.cfg"]
+ENTRYPOINT ["/bin/dumb-init", "--", "/bin/lua", "/entrypoint.lua"]
