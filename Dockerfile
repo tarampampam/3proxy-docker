@@ -8,7 +8,7 @@ ARG LUA_VERSION=5.5.0
 
 RUN --mount=type=cache,target=/var/cache/apk \
     set -x \
-    && apk add --no-cache --virtual .build-deps gcc make musl-dev \
+    && apk add --cache-dir /var/cache/apk --virtual .build-deps gcc make musl-dev \
     && mkdir /tmp/lua \
     && wget -qO- "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz" \
       | tar -xz --strip-components=1 -C /tmp/lua \
@@ -18,26 +18,39 @@ RUN --mount=type=cache,target=/var/cache/apk \
       MYLDFLAGS="-static -Wl,--gc-sections" \
       MYLIBS="" \
     && strip ./lua \
-    && if readelf -l ./lua | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 1; fi \
-    && if readelf -d ./lua 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 1; fi \
+    && if readelf -l ./lua | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 66; fi \
+    && if readelf -d ./lua 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 67; fi \
     && apk del .build-deps \
     && mv ./lua /bin/lua \
     && rm -rf /tmp/lua \
     && /bin/lua -v
 
-# -✂- this stage is used to compile 3proxy itself (~6.3MiB) -----------------------------------------------------------
-FROM docker.io/library/alpine:3.23 AS z3proxy
+# -✂- this stage is used to compile dumb-init (~62KiB) ---------------------------------------------------------------
+FROM docker.io/library/alpine:3.23 AS dumb-init
 
-# renovate: source=github-tags name=3proxy/3proxy
-ARG Z3PROXY_VERSION=0.9.6
+# renovate: source=github-tags name=Yelp/dumb-init
+ARG DUMB_INIT_VERSION=1.2.5
 
 RUN --mount=type=cache,target=/var/cache/apk \
     set -x \
-    && apk add --no-cache \
-      ca-certificates gcc make musl-dev linux-headers openssl-dev openssl-libs-static pcre2-dev pcre2-static \
-    && mkdir /tmp/3proxy \
-    && wget -qO- "https://github.com/3proxy/3proxy/archive/refs/tags/${Z3PROXY_VERSION}.tar.gz" \
-      | tar -xz --strip-components=1 -C /tmp/3proxy
+    && apk add --cache-dir /var/cache/apk --virtual .build-deps binutils gcc make musl-dev xxd \
+    && mkdir /tmp/dumb-init \
+    && wget -qO- "https://github.com/Yelp/dumb-init/archive/refs/tags/v${DUMB_INIT_VERSION}.tar.gz" \
+      | tar -xz --strip-components=1 -C /tmp/dumb-init \
+    && cd /tmp/dumb-init \
+    && make build SHELL=/bin/sh \
+    && if readelf -l ./dumb-init | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 66; fi \
+    && if readelf -d ./dumb-init 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 67; fi \
+    && apk del .build-deps \
+    && mv ./dumb-init /bin/dumb-init \
+    && rm -rf /tmp/dumb-init \
+    && /bin/dumb-init -V
+
+# -✂- this stage is used to compile 3proxy itself (~6.3MiB) -----------------------------------------------------------
+FROM docker.io/library/alpine:3.23 AS the3proxy
+
+# renovate: source=github-tags name=3proxy/3proxy
+ARG THE3PROXY_VERSION=0.9.6
 
 # all plugins compiled statically into the binary (no dlopen / .so files at runtime); each plugin can be enabled
 # in 3proxy config with: `plugin <Name> <entry-symbol> [args]`
@@ -50,8 +63,15 @@ RUN --mount=type=cache,target=/var/cache/apk \
 # - SSLPlugin - can be used to transparently decrypt SSL/TLS data, provide TLS encryption for proxy traffic, and
 #   authenticate using client certificates (usage: `plugin SSLPlugin ssl_plugin` + config commands)
 #   docs: https://3proxy.org/plugins/SSLPlugin/
-RUN --mount=type=bind,source=/src,target=/mnt/src \
+RUN --mount=type=cache,target=/var/cache/apk  \
+    --mount=type=bind,source=/src,target=/mnt/src \
     set -x \
+    && apk add --cache-dir /var/cache/apk ca-certificates \
+    && apk add --cache-dir /var/cache/apk --virtual .build-deps \
+      gcc make musl-dev linux-headers openssl-dev openssl-libs-static pcre2-dev pcre2-static \
+    && mkdir /tmp/3proxy \
+    && wget -qO- "https://github.com/3proxy/3proxy/archive/refs/tags/${THE3PROXY_VERSION}.tar.gz" \
+      | tar -xz --strip-components=1 -C /tmp/3proxy \
     && cd /tmp/3proxy \
     && ln -s Makefile.Linux Makefile \
     && echo "" >> ./Makefile \
@@ -71,23 +91,28 @@ RUN --mount=type=bind,source=/src,target=/mnt/src \
     && mv ./src/plugins/SSLPlugin/my_ssl.o ./src/ \
     && make \
     && strip ./bin/3proxy \
-    && if readelf -l ./bin/3proxy | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 1; fi \
-    && if readelf -d ./bin/3proxy 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 1; fi
+    && if readelf -l ./bin/3proxy | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 66; fi \
+    && if readelf -d ./bin/3proxy 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 67; fi \
+    && apk del .build-deps \
+    && mv ./bin/3proxy /bin/3proxy \
+    && rm -rf /tmp/3proxy
 
 # prepare the root filesystem
-WORKDIR /tmp/rootfs
 RUN --mount=type=bind,from=lua,source=/bin/lua,target=/mnt/lua \
+    --mount=type=bind,from=dumb-init,source=/bin/dumb-init,target=/mnt/dumb-init \
     set -x \
-    && mkdir -p ./etc ./bin ./etc/3proxy ./etc/ssl/certs \
+    && mkdir /tmp/rootfs \
+    && cd /tmp/rootfs \
+    && mkdir -p ./tmp ./etc ./bin ./etc/3proxy ./etc/ssl/certs \
     && echo '3proxy:x:10001:10001::/nonexistent:/sbin/nologin' > ./etc/passwd \
     && echo '3proxy:x:10001:' > ./etc/group \
     && cp /etc/ssl/certs/ca-certificates.crt ./etc/ssl/certs/ca-certificates.crt \
-    && wget -q -o ./bin/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$(arch)" \
-    && mv /tmp/3proxy/bin/3proxy ./bin/3proxy \
+    && mv /bin/3proxy ./bin/3proxy \
     && cp /mnt/lua ./bin/lua \
-    && chmod +x ./bin/*
-
-RUN chown -R 10001:10001 ./etc/3proxy
+    && cp /mnt/dumb-init ./bin/dumb-init \
+    && chmod +x ./bin/* \
+    && chown -R 10001:10001 ./etc/3proxy \
+    && chmod 1777 ./tmp
 
 # Merge into a single layer
 FROM scratch
@@ -101,7 +126,7 @@ LABEL \
     org.opencontainers.image.licenses="WTFPL"
 
 # Import from builder
-COPY --from=z3proxy /tmp/rootfs /
+COPY --from=the3proxy /tmp/rootfs /
 
 # Use an unprivileged user
 USER 3proxy:3proxy
