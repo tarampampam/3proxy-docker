@@ -7,12 +7,14 @@ FROM docker.io/library/alpine:3.23 AS lua
 ARG LUA_VERSION=5.5.0
 
 RUN --mount=type=cache,target=/var/cache/apk \
+    --mount=type=bind,source=/src/lua,target=/mnt/lua-patches \
     set -x \
-    && apk add --cache-dir /var/cache/apk --virtual .build-deps gcc make musl-dev \
+    && apk add --cache-dir /var/cache/apk --virtual .build-deps gcc make musl-dev patch \
     && mkdir /tmp/lua \
     && wget -qO- "https://github.com/lua/lua/archive/refs/tags/v${LUA_VERSION}.tar.gz" \
       | tar -xz --strip-components=1 -C /tmp/lua \
     && cd /tmp/lua \
+    && for f in /mnt/lua-patches/*.patch; do patch -p1 < "$f"; done \
     && make lua \
       MYCFLAGS="-std=c99 -Os -DLUA_USE_POSIX -ffunction-sections -fdata-sections" \
       MYLDFLAGS="-static -Wl,--gc-sections" \
@@ -115,7 +117,7 @@ RUN --mount=type=bind,from=lua,source=/bin/lua,target=/mnt/lua \
     && chmod 1777 ./tmp
 
 # Merge into a single layer
-FROM scratch
+FROM scratch AS runtime
 
 LABEL \
     org.opencontainers.image.title="3proxy" \
@@ -125,11 +127,8 @@ LABEL \
     org.opencontainers.image.vendor="Tarampampam" \
     org.opencontainers.image.licenses="WTFPL"
 
-# Import from builder
 COPY --from=the3proxy /tmp/rootfs /
-
-# Use an unprivileged user
-USER 3proxy:3proxy
+USER 10001:10001
 
 ENTRYPOINT ["/bin/dumb-init", "--"]
 

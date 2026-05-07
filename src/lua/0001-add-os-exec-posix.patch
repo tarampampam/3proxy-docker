@@ -1,0 +1,87 @@
+--- a/loslib.c	2026-05-07 19:31:48.704189274 +0400
++++ b/loslib.c	2026-05-07 19:32:24.532603352 +0400
+@@ -154,6 +154,74 @@
+ }
+ 
+ 
++#if defined(LUA_USE_POSIX)
++// os.exec(path, arg1, arg2, ...) -- available only when compiled with LUA_USE_POSIX
++//
++// Replaces the current process image via execv(3). On success this function
++// never returns -- the calling process is entirely replaced by the new one,
++// inheriting its file descriptors, environment variables, and signal handlers.
++//
++// The first argument 'path' is the absolute path to the executable and is also
++// used as argv[0] (the program name that the new process sees in its own argv).
++// Additional string arguments are forwarded as argv[1], argv[2], etc.
++//
++// On error returns three values: nil, error_message (string), errno (integer).
++//
++// Lua usage -- simple, never returns when successful:
++//   os.exec("/bin/3proxy", "/etc/3proxy/3proxy.cfg")
++//
++// Lua usage -- with error handling:
++//   local ok, err, code = os.exec("/bin/3proxy", "/etc/3proxy/3proxy.cfg")
++//   if not ok then
++//     io.stderr:write("exec failed: " .. err .. " (errno " .. code .. ")\n")
++//     os.exit(1)
++//   end
++static int os_exec (lua_State *L) {
++  const char *path = luaL_checkstring(L, 1); // path to the executable to run
++  int i, n = lua_gettop(L);                  // n = total number of Lua arguments
++  int en;
++  const char **argv;
++
++  // Validate that all extra arguments are strings before allocating anything.
++  // luaL_checkstring raises a Lua error on a type mismatch; doing this before
++  // allocation ensures no leak can occur when a bad argument is detected.
++  for (i = 2; i <= n; i++) {
++    luaL_checkstring(L, i);
++  }
++
++  // Allocate the argv array via Lua's own memory manager (lua_newuserdatauv).
++  // This follows the Lua standard library convention: no direct malloc/free.
++  // Lua pushes the block as a userdata value onto its stack and reclaims it
++  // automatically via GC -- no explicit free() is needed anywhere below.
++  // Slots 0..n-1 hold argument pointers; slot n is the NULL sentinel that
++  // execv(3) requires to mark the end of the argument list.
++  argv = (const char **)lua_newuserdatauv(L,
++                           (size_t)(n + 1) * sizeof(const char *), 0);
++
++  argv[0] = path;                       // argv[0] is the program name by convention
++  for (i = 1; i < n; i++) {
++    argv[i] = lua_tostring(L, i + 1);   // remaining Lua args become argv[1], argv[2], ...
++  }
++  argv[n] = NULL;                       // NULL sentinel required by execv(3)
++
++  errno = 0;
++  // Replace the current process image with the new executable.
++  // The cast (char * const *) satisfies the POSIX signature while keeping
++  // our array elements const internally. Never returns on success.
++  execv(path, (char * const *)argv);
++
++  // execv(3) returned, which means it failed. Capture errno immediately before
++  // any other call that might overwrite it, then report the error to Lua.
++  // The argv userdata is still on the Lua stack and will be GC'd on return.
++  en = errno;
++  luaL_pushfail(L);                   // first return value: nil (failure marker)
++  lua_pushstring(L, strerror(en));    // second return value: human-readable error
++  lua_pushinteger(L, en);             // third return value: raw errno number
++  return 3;
++}
++#endif
++
++
+ static int os_remove (lua_State *L) {
+   const char *filename = luaL_checkstring(L, 1);
+   errno = 0;
+@@ -410,6 +478,9 @@
+   {"clock",     os_clock},
+   {"date",      os_date},
+   {"difftime",  os_difftime},
++#if defined(LUA_USE_POSIX)
++  {"exec",      os_exec},
++#endif
+   {"execute",   os_execute},
+   {"exit",      os_exit},
+   {"getenv",    os_getenv},
