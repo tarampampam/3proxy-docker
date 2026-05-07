@@ -28,8 +28,6 @@ FROM docker.io/library/alpine:3.23 AS z3proxy
 # renovate: source=github-tags name=3proxy/3proxy
 ARG Z3PROXY_VERSION=0.9.6
 
-COPY static_plugins.c /tmp/static_plugins.c
-
 RUN --mount=type=cache,target=/var/cache/apk \
     set -x \
     && apk add --no-cache --virtual .build-deps \
@@ -40,34 +38,57 @@ RUN --mount=type=cache,target=/var/cache/apk \
     && wget -qO- "https://github.com/3proxy/3proxy/archive/refs/tags/${Z3PROXY_VERSION}.tar.gz" \
       | tar -xz --strip-components=1 -C /tmp/3proxy
 
-# Patch sources and build a fully-static 3proxy binary with all plugins embedded
-# proxy.c source: <https://github.com/3proxy/3proxy/blob/0.9.3/src/proxy.c>
-RUN set -x \
-    && cd /tmp/3proxy \
-    && echo '#define ANONYMOUS 1' >> ./src/3proxy.h \
-    && sed -i 's~\(<\/head>\)~<style>:root{--color-bg-primary:#fff;--color-text-primary:#131313;--color-text-secondary:#232323}\
-@media (prefers-color-scheme: dark){:root{--color-bg-primary:#212121;--color-text-primary:#fafafa;--color-text-secondary:#bbb}}\
-html,body{height:100%;font-family:sans-serif;background-color:var(--color-bg-primary);color:var(--color-text-primary);margin:0;\
-padding:0;text-align:center}body{align-items:center;display:flex;justify-content:center;flex-direction:column;height:100vh}\
-h1,h2{margin-bottom:0;font-size:2.5em}h2::before{content:'"'"'Proxy error'"'"';display:block;font-size:.4em;\
-color:var(--color-text-secondary);font-weight:100}h3,p{color:var(--color-text-secondary)}</style>\1~' ./src/proxy.c \
-    && cp /tmp/static_plugins.c ./src/static_plugins.c \
-    && PFLAGS="-Os -I./src -D_GNU_SOURCE -D_THREAD_SAFE -D_REENTRANT -DFD_SETSIZE=4096 -DWITH_POLL -DWITH_NETFILTER -DNOODBC -pthread -c" \
-    && gcc $PFLAGS -o ./src/static_plugins.o    ./src/static_plugins.c \
+RUN --mount=type=bind,source=/src,target=/mnt/src \
+    set -x \
+    && cd /tmp/3proxy/src \
+    && cp /mnt/src/3proxy/static_plugins.c ./static_plugins.c \
+    && PFLAGS="-Os -fPIC -fno-strict-aliasing \
+      -I./src \
+      -D_GNU_SOURCE \
+      -DGETHOSTBYNAME_R \
+      -D_THREAD_SAFE \
+      -D_REENTRANT \
+      -DNOODBC \
+      -DFD_SETSIZE=4096 \
+      -DWITH_POLL \
+      -DWITH_NETFILTER \
+      -DWITHSPLICE \
+      -pthread \
+      -c" \
+    && gcc $PFLAGS -o ./static_plugins.o ./static_plugins.c \
     && gcc $PFLAGS -Dstart=strings_plugin_start \
-         -o ./src/strings_plugin.o    ./src/plugins/StringsPlugin/StringsPlugin.c \
+      -o ./strings_plugin.o \
+      ./plugins/StringsPlugin/StringsPlugin.c \
     && gcc $PFLAGS -Dstart=traffic_plugin_start -Dconf=traffic_conf -Dcommandhandlers=traffic_commandhandlers \
-         -o ./src/traffic_plugin.o    ./src/plugins/TrafficPlugin/TrafficPlugin.c \
+      -o ./traffic_plugin.o \
+      ./plugins/TrafficPlugin/TrafficPlugin.c \
     && gcc $PFLAGS \
-         -o ./src/transparent_plugin.o ./src/plugins/TransparentPlugin/transparent_plugin.c \
+      -o ./transparent_plugin.o \
+      ./plugins/TransparentPlugin/transparent_plugin.c \
     && gcc $PFLAGS \
-         -o ./src/pcre_plugin.o        ./src/plugins/PCREPlugin/pcre_plugin.c \
+      -o ./pcre_plugin.o \
+      ./plugins/PCREPlugin/pcre_plugin.c \
     && gcc $PFLAGS \
-         -o ./src/ssl_plugin.o         ./src/plugins/SSLPlugin/ssl_plugin.c \
+      -o ./ssl_plugin.o \
+      ./plugins/SSLPlugin/ssl_plugin.c \
     && gcc $PFLAGS \
-         -o ./src/my_ssl.o             ./src/plugins/SSLPlugin/my_ssl.c \
-    && printf '\nPLUGINS =\nCOMPATLIBS += static_plugins.o strings_plugin.o traffic_plugin.o transparent_plugin.o pcre_plugin.o ssl_plugin.o my_ssl.o\nLIBS = -l:libssl.a -l:libcrypto.a -l:libpcre2-8.a\nLDFLAGS += -static\n' >> ./Makefile.Linux \
-    && make -f Makefile.Linux \
+      -o ./my_ssl.o \
+      ./plugins/SSLPlugin/my_ssl.c \
+    && cd /tmp/3proxy \
+    && ln -s Makefile.Linux Makefile \
+    && echo "" >> ./Makefile \
+    && echo "PLUGINS =" >> ./Makefile \
+    && echo "COMPATLIBS += \
+      static_plugins.o \
+      strings_plugin.o \
+      traffic_plugin.o \
+      transparent_plugin.o \
+      pcre_plugin.o \
+      ssl_plugin.o \
+      my_ssl.o" >> ./Makefile \
+    && echo "LIBS = -l:libssl.a -l:libcrypto.a -l:libpcre2-8.a" >> ./Makefile \
+    && echo "LDFLAGS += -static" >> ./Makefile \
+    && make \
     && strip ./bin/3proxy
 
 # Prepare filesystem for 3proxy running
