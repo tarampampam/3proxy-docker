@@ -132,8 +132,6 @@ else
   local function toConfig(s) lines[#lines + 1] = s end
 
   toConfig("#!" .. PROXY_BIN)
-  -- stores config path so 3proxy can re-read it on SIGHUP reload
-  toConfig("config " .. CFG_PATH)
   toConfig("")
   -- upstream DNS resolvers for all hostname resolution; up to 5 servers, default port 53/UDP
   toConfig("nserver " .. primary_resolver)
@@ -145,7 +143,15 @@ else
   -- DNS response cache table size in entries (min 256); reduces latency and upstream DNS traffic
   toConfig("nscache " .. dns_cache_size)
   toConfig("")
-  -- timeouts in seconds: byte(1,5) string(30,60) connection(180,1800) dns(15) parent-proxy(60)
+  -- timeouts in seconds (8 positional values):
+  --   1    SINGLEBYTE_S: SO_LINGER and single-byte reads on an established connection
+  --   5    SINGLEBYTE_L: first byte from client; DNS UDP send/receive
+  --   30   STRING_S:     send/read a protocol line (request/response headers, TLS handshake)
+  --   60   STRING_L:     wait for server banner or a slow response line
+  --   180  CONNECTION_S: idle timeout for short-lived connections (e.g. FTP data channel)
+  --   1800 CONNECTION_L: idle timeout for long-lived tunnels (TCP/TLS relay)
+  --   15   DNS_TO:       upstream DNS resolver response
+  --   60   CHAIN_TO:     handshake with a parent (chained) proxy
   toConfig("timeouts 1 5 30 60 180 1800 15 60")
   toConfig("")
   -- log destination: file path | /dev/stdout | /dev/null | @syslog-tag | &odbc-dsn

@@ -6,7 +6,7 @@ FROM docker.io/library/alpine:3.23 AS lua
 # renovate: source=github-tags name=lua/lua
 ARG LUA_VERSION=5.5.0
 
-RUN --mount=type=cache,target=/var/cache/apk \
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     --mount=type=bind,source=/patches/lua,target=/mnt/patches\
     set -x \
     && apk add --cache-dir /var/cache/apk --virtual .build-deps gcc make musl-dev patch \
@@ -33,7 +33,7 @@ FROM docker.io/library/alpine:3.23 AS dumb-init
 # renovate: source=github-tags name=Yelp/dumb-init
 ARG DUMB_INIT_VERSION=1.2.5
 
-RUN --mount=type=cache,target=/var/cache/apk \
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     set -x \
     && apk add --cache-dir /var/cache/apk --virtual .build-deps binutils gcc make musl-dev xxd \
     && mkdir /tmp/dumb-init \
@@ -65,7 +65,7 @@ ARG THE3PROXY_VERSION=0.9.6
 # - SSLPlugin - can be used to transparently decrypt SSL/TLS data, provide TLS encryption for proxy traffic, and
 #   authenticate using client certificates (usage: `plugin SSLPlugin ssl_plugin` + config commands)
 #   docs: https://3proxy.org/plugins/SSLPlugin/
-RUN --mount=type=cache,target=/var/cache/apk  \
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     --mount=type=bind,source=/patches/3proxy,target=/mnt/patches \
     set -x \
     && apk add --cache-dir /var/cache/apk ca-certificates \
@@ -81,6 +81,13 @@ RUN --mount=type=cache,target=/var/cache/apk  \
     && echo "COMPATLIBS += static_plugins.o strings_plugin.o pcre_plugin.o ssl_plugin.o my_ssl.o" >> ./Makefile \
     && echo "LIBS = -l:libssl.a -l:libcrypto.a -l:libpcre2-8.a" >> ./Makefile \
     && echo "LDFLAGS += -static" >> ./Makefile \
+    && sed -i 's~\(<\/head>\)~<style>:root{--a:#fff;--b:#131313;--c:#232323}@media (prefers-color-scheme: dark){:root{\
+--a:#212121;--b:#fafafa;--c:#bbb}}body{font-family:sans-serif;background-color:var(--a);color:var(--b);margin:0;\
+padding:1.5rem;box-sizing:border-box;text-align:center;display:flex;align-items:center;justify-content:center;\
+flex-direction:column;min-height:100vh;min-height:100svh}h2{margin:0;font-size:clamp(1.5rem,6vw,2.5rem)}h2::before{\
+content:'"'"'Proxy error'"'"';display:block;font-size:.4em;color:var(--c);font-weight:100}h3{color:var(--c);max-width:50ch;\
+margin-inline:auto}pre{color:var(--c);font-size:.9rem;max-width:80ch;margin-inline:auto;text-align:left;white-space:\
+pre-wrap;word-break:break-word}</style>\1~' ./src/proxy.c \
     && cp /mnt/patches/static_plugins.c ./src/static_plugins.c \
     && gcc -c -fPIC -D_GNU_SOURCE -o ./src/static_plugins.o ./src/static_plugins.c \
     && for p in StringsPlugin PCREPlugin SSLPlugin; do cp ./Makefile ./src/plugins/$p/Makefile.var; done \
@@ -120,6 +127,9 @@ RUN --mount=type=bind,from=lua,source=/bin/lua,target=/mnt/lua \
     && chown -R 10001:10001 ./etc/3proxy \
     && chmod 1777 ./tmp
 
+# install portcheck utility (used in healthcheck), docs: https://github.com/tarampampam/microcheck
+COPY --from=ghcr.io/tarampampam/microcheck:1 /bin/portcheck /tmp/rootfs/bin/portcheck
+
 # Merge into a single layer
 FROM scratch AS runtime
 
@@ -133,5 +143,11 @@ LABEL \
 
 COPY --from=rootfs /tmp/rootfs /
 USER 10001:10001
+ENV PROXY_PORT=3128 SOCKS_PORT=1080
 
-ENTRYPOINT ["/bin/dumb-init", "--", "/bin/lua", "/entrypoint.lua"]
+HEALTHCHECK --interval=10s --start-interval=1s --start-period=2s CMD [\
+  "/bin/portcheck", "--port-env", "PROXY_PORT" \
+]
+
+ENTRYPOINT ["/bin/dumb-init", "--"]
+CMD ["/bin/lua", "/entrypoint.lua"]
