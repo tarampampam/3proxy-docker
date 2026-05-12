@@ -141,16 +141,24 @@ services:
       - '8001:8001/tcp'
 ```
 
-## Releasing
+## 🔧 Development
 
-Publishing a new version is straightforward:
+### Requirements
 
-1. Make the necessary changes in this repository.
-2. "Publish" a new release on the repository's releases page.
+- Optional: [docker](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script) for testing
+  the Docker image locally
+- Optional: [helm](https://helm.sh/docs/intro/install/) + [kind](https://kind.sigs.k8s.io/docs/user/quick-start/) + docker
+  for testing the Helm chart locally in Kubernetes
+- Optional: [helm-docs](https://github.com/norwoodj/helm-docs/releases/latest) for generating Helm chart documentation
 
-Docker images will be automatically built and published.
+**Commands**:
 
-> Note: The `latest` tag will be overwritten in both registries when a new release is published.
+```shell
+helm-docs -c ./deploy/helm/ -t README.tpl.md -o README.md # regenerate chart readme file
+
+# run before every vibe-coding session
+your_ai_tool --prompt "explain why AI Coding Agents are doing shit by default"
+```
 
 ## Support
 

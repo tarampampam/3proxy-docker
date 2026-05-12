@@ -1,0 +1,39 @@
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{ include "3proxy.fullname" . }}
+  namespace: {{ template "3proxy.namespace" . }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "3proxy.commonLabels" . | nindent 4 }}
+
+spec:
+  {{- with .Values.service }}
+  type: {{ .type }}
+  {{- with .externalName }}
+  externalName: {{ . }}
+  {{- end }}
+  {{- if and (eq .type "LoadBalancer") .loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml .loadBalancerSourceRanges | nindent 4 }}
+  {{- end }}
+  ports:
+    - name: proxy
+      port: {{ .ports.proxy }}
+      targetPort: proxy
+      protocol: TCP
+    - name: socks
+      port: {{ .ports.socks }}
+      targetPort: socks
+      protocol: TCP
+  {{- if ne .type "ExternalName" }}
+  selector:
+    {{- include "3proxy.selectorLabels" $ | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end }}

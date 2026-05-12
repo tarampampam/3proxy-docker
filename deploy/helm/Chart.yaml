@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://json.schemastore.org/chart.json
+
+apiVersion: v2
+name: 3proxy
+description: |
+  Powerful and lightweight proxy server — HTTP/HTTPS CONNECT and SOCKS4/5 in a single minimal container image
+type: application
+version: 0.0.0 # will be replaced by the release workflow
+appVersion: 0.0.0 # will be replaced by the release workflow
+icon: https://github.com/user-attachments/assets/023186cf-b153-459c-8417-038fd87a2065
+home: https://github.com/tarampampam/3proxy-docker
+sources: [https://github.com/tarampampam/3proxy-docker]
+keywords: [proxy, 3proxy, http, https, socks, socks4, socks5, kubernetes]
+
+annotations:
+  artifacthub.io/license: WTFPL
+  artifacthub.io/maintainers: |
+    - name: tarampampam
+      email: 7326800+tarampampam@users.noreply.github.com
+  artifacthub.io/links: |
+    - name: GitHub
+      url: https://github.com/tarampampam/3proxy-docker
+    - name: Container Registry
+      url: https://ghcr.io/tarampampam/3proxy
