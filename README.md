@@ -36,7 +36,7 @@ over the vanilla upstream build:
   child processes
 - **Built-in healthcheck** - the container reports its own health to the runtime out of the box
 - **Lua entrypoint** - startup logic lives in a readable Lua script, easy to extend without rebuilding
-- **Multi-arch images** - `amd64`, `arm64`, `arm/v6`, `arm/v7`, `ppc64le`, `s390x`
+- **Multi-arch images** - `amd64`, `arm64`, `arm/v7`, `ppc64le`, `s390x`
 - **Pre-compiled releases** - every GitHub release ships standalone 3proxy binaries for common OSes, ready to
   use without Docker
 - **Helm chart** - production-ready chart with security-first defaults: non-root, minimal pod permissions,
