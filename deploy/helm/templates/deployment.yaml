@@ -4,10 +4,10 @@ apiVersion: apps/v1
 kind: {{ $kind }}
 
 metadata:
-  name: {{ include "3proxy.fullname" . }}
-  namespace: {{ template "3proxy.namespace" . }}
+  name: {{ include "the3proxy.fullname" . }}
+  namespace: {{ template "the3proxy.namespace" . }}
   labels:
-    {{- include "3proxy.commonLabels" . | nindent 4 }}
+    {{- include "the3proxy.commonLabels" . | nindent 4 }}
 
 spec:
   {{- if ne $kind "DaemonSet" }}
@@ -24,7 +24,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "3proxy.selectorLabels" . | nindent 6 }}
+      {{- include "the3proxy.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.deployment.podAnnotations }}
@@ -32,7 +32,7 @@ spec:
         {{- tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "3proxy.commonLabels" . | nindent 8 }}
+        {{- include "the3proxy.commonLabels" . | nindent 8 }}
         {{- with .Values.deployment.labels }}
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
@@ -43,7 +43,7 @@ spec:
         {{- tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ include "3proxy.fullname" . }}
+        - name: {{ include "the3proxy.fullname" . }}
 
           {{- with .Values.deployment.securityContext }}
           securityContext:

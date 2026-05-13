@@ -84,7 +84,7 @@ jobs:
       - uses: azure/setup-helm@v5
       - name: Install the chart
         run: |
-          helm install 3proxy ./deploy/helm \
+          helm install the3proxy ./deploy/helm \
             --wait \
             --set image.repository=3proxy \
             --set image.tag=ci \
@@ -96,7 +96,7 @@ jobs:
             --image=curlimages/curl:latest \
             --restart=Never --rm -i \
             -- curl -s -o /dev/null --fail \
-              --proxy http://3proxy:3128 \
+              --proxy http://the3proxy:3128 \
               --proxy-user evil:live \
               --connect-timeout 5 \
               --max-time 10 \

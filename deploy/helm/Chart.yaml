@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/chart.json
 
 apiVersion: v2
-name: 3proxy
+name: the3proxy
 description: |
   Powerful and lightweight proxy server (3proxy) - HTTP/HTTPS CONNECT and SOCKS4/5 in a single minimal
   container image
