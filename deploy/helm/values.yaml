@@ -1,6 +1,6 @@
-# -- (string/null) The name of the Helm release
+# -- (string/null) Override the full name used for all Kubernetes resources (Deployment, Service, …)
 fullnameOverride: null
-# -- (string/null) This is to override the chart name
+# -- (string/null) Override the chart name used when constructing resource names
 nameOverride: null
 # -- (string/null) Override the default Release Namespace for Helm
 namespaceOverride: null
@@ -16,7 +16,7 @@ image:
 deployment:
   # -- Enable deployment (`deployment.yaml` is not rendered when disabled)
   enabled: true
-  # -- Workload kind — `Deployment` or `DaemonSet`
+  # -- Workload kind - `Deployment` or `DaemonSet`
   kind: Deployment
   # -- How many replicas to run (**ignored when `kind` is `DaemonSet`**)
   replicas: 1
@@ -45,9 +45,10 @@ deployment:
     runAsGroup: 10001               # GID defined in the Dockerfile
     readOnlyRootFilesystem: true    # /etc/3proxy and /tmp are always mounted as emptyDir volumes
     allowPrivilegeEscalation: false # prevent setuid/setcap privilege escalation
-    capabilities: {drop: [ALL]}    # drop all Linux capabilities; the proxy needs none
+    capabilities: {drop: [ALL]}     # drop all Linux capabilities; the proxy needs none
+    seccompProfile: {type: RuntimeDefault} # restrict syscalls to the default allowlist
   probe:
-    # -- Named port to probe — `proxy` or `socks`
+    # -- Named port to probe - `proxy` or `socks`
     port: proxy
     # -- How often (in seconds) to perform the probe
     interval: 10
@@ -73,6 +74,9 @@ deployment:
   # -- Tolerations for pod assignment (supports templating), more information can be
   # [found here](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
+  # -- Topology spread constraints for pod distribution across nodes/zones (supports templating), more information
+  # can be [found here](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+  topologySpreadConstraints: []
   # -- Additional environment variables to set in the container (supports templating)
   env: []
   # -- Additional arguments to pass to the container (supports templating)
@@ -86,7 +90,7 @@ service:
   # -- Service type, more information can be
   # [found here](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
   type: ClusterIP
-  # -- External DNS hostname for `type: ExternalName` — required when `type` is `ExternalName`
+  # -- External DNS hostname for `type: ExternalName` - required when `type` is `ExternalName`
   externalName: null
   # -- Restrict load-balancer access to specific CIDR ranges (works only with `type: LoadBalancer`)
   loadBalancerSourceRanges: []
@@ -102,7 +106,7 @@ config:
   log:
     # -- Enable logging; set to `false` to redirect output to `/dev/null`
     enabled: true
-    # -- (string/null) Log output destination: a file path, `/dev/stdout`, `/dev/null`, or `@syslog-tag`
+    # -- (string/null) Log output destination: a file path, `/dev/stdout`, `/dev/null`, etc.
     # @default -- `/dev/stdout`
     output: null
 
@@ -113,9 +117,10 @@ config:
     # -- (string/null) Password for proxy authentication. To read from a Secret or ConfigMap instead, leave this
     # `null` and inject `PROXY_PASSWORD` via `deployment.env` using `valueFrom` (see the README for examples).
     password: null
-    # -- Additional accounts as a list of `{login, password}` objects. Auth must be enabled (login + password set).
-    # To source extra accounts from a Secret or ConfigMap, leave this empty and inject `EXTRA_ACCOUNTS` (formatted
-    # as `login:pass;login2:pass2`) via `deployment.env` using `valueFrom` (see the README for examples).
+    # -- ([]object/null) Additional accounts as a list of `{login, password}` objects. Auth must be enabled
+    # (login + password set). To source extra accounts from a Secret or ConfigMap, leave this empty and inject
+    # `EXTRA_ACCOUNTS` (formatted as `login:pass;login2:pass2`) via `deployment.env` using `valueFrom`
+    # (see the README for examples).
     extraAccounts: [] # Array<{login: string, password: string}>
 
   dns:
@@ -141,5 +146,5 @@ config:
     maxConnections: null
 
   # -- (string/null) Additional 3proxy configuration lines appended after the main config block but before
-  # `proxy`/`socks`/`flush`. Literal `\n` sequences are expanded to newlines by the entrypoint (useful with `--set`).
+  # `proxy`/`socks`/`flush`. Use `\\n` as a line separator when passing via `--set`.
   extraConfig: null

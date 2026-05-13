@@ -25,11 +25,15 @@ spec:
   ports:
     - name: proxy
       port: {{ .ports.proxy }}
+      {{- if ne .type "ExternalName" }}
       targetPort: proxy
+      {{- end }}
       protocol: TCP
     - name: socks
       port: {{ .ports.socks }}
+      {{- if ne .type "ExternalName" }}
       targetPort: socks
+      {{- end }}
       protocol: TCP
   {{- if ne .type "ExternalName" }}
   selector:

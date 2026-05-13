@@ -28,16 +28,17 @@ Require a username and password before allowing any connection:
 ```yaml
 config:
   auth:
-    login: myuser
-    password: s3cr3t
+    login: evil
+    password: live
 ```
 
 Via `--set`:
 
 ```shell
 helm install 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy \
-  --set config.auth.login=myuser \
-  --set config.auth.password=s3cr3t
+  --version {{ template "chart.version" . }} \
+  --set 'config.auth.login=evil' \
+  --set 'config.auth.password=live'
 ```
 
 ### Multiple accounts
@@ -76,22 +77,14 @@ kubectl create secret generic proxy-auth \
 
 ```yaml
 config:
-  auth:
-    login: null    # leave unset — injected via deployment.env below
-    password: null
+  auth: {login: null, password: null} # leave unset - injected via deployment.env below
 
 deployment:
   env:
     - name: PROXY_LOGIN
-      valueFrom:
-        secretKeyRef:
-          name: proxy-auth
-          key: login
+      valueFrom: {secretKeyRef: {name: 'proxy-auth', key: 'login'}}
     - name: PROXY_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: proxy-auth
-          key: password
+      valueFrom: {secretKeyRef: {name: 'proxy-auth', key: 'password'}}
 ```
 
 #### Login and password from a ConfigMap
@@ -108,15 +101,9 @@ kubectl create configmap proxy-config \
 deployment:
   env:
     - name: PROXY_LOGIN
-      valueFrom:
-        configMapKeyRef:
-          name: proxy-config
-          key: login
+      valueFrom: {configMapKeyRef: {name: 'proxy-config', key: 'login'}}
     - name: PROXY_PASSWORD
-      valueFrom:
-        configMapKeyRef:
-          name: proxy-config
-          key: password
+      valueFrom: {configMapKeyRef: {name: 'proxy-config', key: 'password'}}
 ```
 
 #### Extra accounts from a Secret
@@ -133,74 +120,14 @@ kubectl create secret generic proxy-extra-accounts \
 ```yaml
 config:
   auth:
-    login: admin       # primary account still set here
+    login: admin # primary account still set here
     password: adminpass
-    extraAccounts: []  # leave empty — injected via deployment.env below
+    extraAccounts: [] # leave empty - injected via deployment.env below
 
 deployment:
   env:
     - name: EXTRA_ACCOUNTS
-      valueFrom:
-        secretKeyRef:
-          name: proxy-extra-accounts
-          key: accounts
-```
-
-#### Using a single Secret for all credentials
-
-```shell
-kubectl create secret generic proxy-auth \
-  --from-literal=login=admin \
-  --from-literal=password=adminpass \
-  --from-literal=extra='alice:alicepass;bob:bobpass'
-```
-
-`values.yaml`:
-
-```yaml
-deployment:
-  env:
-    - name: PROXY_LOGIN
-      valueFrom:
-        secretKeyRef: {name: proxy-auth, key: login}
-    - name: PROXY_PASSWORD
-      valueFrom:
-        secretKeyRef: {name: proxy-auth, key: password}
-    - name: EXTRA_ACCOUNTS
-      valueFrom:
-        secretKeyRef: {name: proxy-auth, key: extra}
-```
-
-#### Templated Secret name (using the release name)
-
-`values.yaml`:
-
-```yaml
-deployment:
-  env:
-    - name: PROXY_LOGIN
-      valueFrom:
-        secretKeyRef:
-          name: '{{ .Release.Name }}-auth'
-          key: login
-    - name: PROXY_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: '{{ .Release.Name }}-auth'
-          key: password
-```
-
-### DaemonSet — proxy on every node
-
-Run one proxy instance per node so that workloads can always reach a local proxy:
-
-```yaml
-deployment:
-  kind: DaemonSet
-  updateStrategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
+      valueFrom: {secretKeyRef: {name: proxy-extra-accounts, key: accounts}}
 ```
 
 ### Custom listen ports
@@ -210,85 +137,36 @@ Change the ports that the proxy and SOCKS servers bind to:
 ```yaml
 config:
   ports:
-    proxy: 8080
-    socks: 1081
+    proxy: &http-proxy-port 8080
+    socks: &socks-proxy-port 1081
 
 service:
   ports:
-    proxy: 8080
-    socks: 1081
-```
-
-### ExternalName service
-
-Point the service at an external proxy (e.g. a corporate gateway) without deploying the proxy itself.
-The Deployment can be disabled so only the Service is rendered:
-
-```yaml
-deployment:
-  enabled: false
-
-service:
-  type: ExternalName
-  externalName: corporate-proxy.internal.example.com
-```
-
-### Custom DNS resolvers
-
-Override the default resolvers (Cloudflare and Google) with your own:
-
-```yaml
-config:
-  dns:
-    primaryResolver: "192.168.1.1"
-    secondaryResolver: "192.168.1.2"
-    cacheSize: 32768
-```
-
-### Limiting connections
-
-Cap the number of simultaneous connections to protect upstream resources:
-
-```yaml
-config:
-  limits:
-    maxConnections: 256
+    proxy: *http-proxy-port
+    socks: *socks-proxy-port
 ```
 
 ### Extra 3proxy configuration
 
 Append raw 3proxy directives after the generated config block (before `proxy`/`socks`/`flush`).
-Use `\n` to separate lines when passing via `--set`:
 
 `values.yaml`:
 
 ```yaml
 config:
   extraConfig: |
-    # allow only RFC-1918 destinations
     allow * * 10.0.0.0/8
     allow * * 172.16.0.0/12
     allow * * 192.168.0.0/16
     deny *
 ```
 
-Via `--set`:
+Via `--set` - use `\\n` (double backslash) as the line separator:
 
 ```shell
 helm install 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy \
-  --set 'config.extraConfig=allow * * 10.0.0.0/8\ndeny *'
-```
-
-### Restricting LoadBalancer access
-
-When using a cloud load balancer, allow traffic only from specific CIDR ranges:
-
-```yaml
-service:
-  type: LoadBalancer
-  loadBalancerSourceRanges:
-    - "10.0.0.0/8"
-    - "203.0.113.0/24"
+  --version {{ template "chart.version" . }} \
+  --set 'config.extraConfig=allow * * 10.0.0.0/8\\ndeny *'
 ```
 
 ### Disabling logging
@@ -301,107 +179,53 @@ config:
     enabled: false
 ```
 
----
+### Custom 3proxy configuration file
 
-## Migrating from the previous chart version
+If you need full control over the 3proxy configuration, you can mount a custom config file directly.
+When `/etc/3proxy/3proxy.cfg` already exists at container start-up, the entrypoint skips automatic
+config generation and uses your file as-is. All `config.*` chart values are then ignored.
 
-The previous chart version used a `plain`/`fromSecret`/`fromConfigMap` sub-structure for auth fields.
-This has been replaced with flat values for plain credentials and `deployment.env` for everything else.
+First, create a ConfigMap with a valid 3proxy configuration:
 
-### Login and password
+`my-3proxy.cfg`:
 
-**Before:**
-
-```yaml
-config:
-  auth:
-    login:
-      plain: myuser          # or fromSecret / fromConfigMap
-    password:
-      plain: s3cr3t
+```text
+nserver 1.1.1.1
+nserver 8.8.8.8
+nscache 65536
+timeouts 1 5 30 60 180 1800 15 60
+log /dev/stdout
+maxconn 512
+users myuser:CL:mypassword
+auth strong
+allow myuser
+proxy -a -p3128
+socks -a -p1080
+flush
 ```
 
-**After (plain values):**
-
-```yaml
-config:
-  auth:
-    login: myuser
-    password: s3cr3t
+```shell
+kubectl create configmap 3proxy-custom-config \
+  --from-file=3proxy.cfg=./my-3proxy.cfg
 ```
 
-**After (from a Secret):**
-
-```yaml
-# config.auth.login and config.auth.password stay null (default)
-deployment:
-  env:
-    - name: PROXY_LOGIN
-      valueFrom:
-        secretKeyRef:
-          name: proxy-auth
-          key: login
-    - name: PROXY_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: proxy-auth
-          key: password
-```
-
-**After (from a ConfigMap):**
+`values.yaml`:
 
 ```yaml
 deployment:
-  env:
-    - name: PROXY_LOGIN
-      valueFrom:
-        configMapKeyRef:
-          name: proxy-config
-          key: login
-    - name: PROXY_PASSWORD
-      valueFrom:
-        configMapKeyRef:
-          name: proxy-config
-          key: password
+  volumes:
+    - name: custom-cfg
+      configMap: {name: 3proxy-custom-config}
+  volumeMounts:
+    - name: custom-cfg
+      mountPath: /etc/3proxy/3proxy.cfg
+      subPath: 3proxy.cfg
+      readOnly: true
 ```
 
-### Extra accounts
-
-**Before:**
-
-```yaml
-config:
-  auth:
-    extraAccounts:
-      plain:
-        - {login: alice, password: alicepass}
-      fromSecret:
-        enabled: true
-        secretName: proxy-extra
-        secretKey: accounts
-```
-
-**After (plain list):**
-
-```yaml
-config:
-  auth:
-    extraAccounts:
-      - {login: alice, password: alicepass}
-```
-
-**After (from a Secret — value must be `login:pass;login2:pass2`):**
-
-```yaml
-# config.auth.extraAccounts stays [] (default)
-deployment:
-  env:
-    - name: EXTRA_ACCOUNTS
-      valueFrom:
-        secretKeyRef:
-          name: proxy-extra
-          key: accounts
-```
+> **Note:** `subPath` is required because the chart always mounts `/etc/3proxy` as an `emptyDir`
+> volume. Without it, Kubernetes would reject two volumes at the same mount point. With `subPath`,
+> only the single file is overlaid inside the existing emptyDir.
 
 ## 💊 Support
 

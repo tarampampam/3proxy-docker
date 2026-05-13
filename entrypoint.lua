@@ -92,9 +92,7 @@ else
   local proxy_port         = getenv(ENV_PROXY_PORT,         "3128")
   local socks_port         = getenv(ENV_SOCKS_PORT,         "1080")
   local extra_accounts     = parse_extra_accounts(getenv(ENV_EXTRA_ACCOUNTS, ""))
-  -- EXTRA_CONFIG may encode newlines as the literal two-character sequence \n (common when passing multiline
-  -- values via docker -e or Kubernetes env)
-  local extra_config       = getenv(ENV_EXTRA_CONFIG, ""):gsub("\\n", "\n")
+  local extra_config       = getenv(ENV_EXTRA_CONFIG, ""):gsub("\\n", "\n") -- expand literal \n
 
   -- validate numeric inputs at the environment boundary
   if not is_positive_int(proxy_port, 65535) then
@@ -194,8 +192,9 @@ else
 
   if trim(extra_config) ~= "" then
     toConfig("")
-    toConfig("# Additional configuration")
-    toConfig(extra_config)
+    for line in (extra_config .. "\n"):gmatch("([^\n]*)\n") do
+      toConfig(line)
+    end
   end
 
   toConfig("")

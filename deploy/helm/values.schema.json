@@ -51,7 +51,7 @@
           }
         },
         "securityContext": {
-          "type": "object",
+          "oneOf": [{"type": "object"}, {"type": "null"}],
           "properties": {
             "runAsNonRoot": {"type": "boolean"},
             "runAsUser": {"type": "integer"},
@@ -63,6 +63,13 @@
               "properties": {
                 "drop": {"type": "array", "items": {"type": "string"}},
                 "add": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "seccompProfile": {
+              "type": "object",
+              "properties": {
+                "type": {"type": "string", "enum": ["RuntimeDefault", "Localhost", "Unconfined"]},
+                "localhostProfile": {"type": "string"}
               }
             }
           }
@@ -149,6 +156,22 @@
               "operator": {"type": "string"},
               "value": {"type": "string"},
               "effect": {"type": "string"}
+            }
+          }
+        },
+        "topologySpreadConstraints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "maxSkew": {"type": "integer", "minimum": 1},
+              "topologyKey": {"type": "string"},
+              "whenUnsatisfiable": {"type": "string", "enum": ["DoNotSchedule", "ScheduleAnyway"]},
+              "labelSelector": {"type": "object"},
+              "matchLabelKeys": {"type": "array", "items": {"type": "string"}},
+              "minDomains": {"type": "integer"},
+              "nodeAffinityPolicy": {"type": "string"},
+              "nodeTaintsPolicy": {"type": "string"}
             }
           }
         },
