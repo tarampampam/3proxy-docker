@@ -79,6 +79,27 @@ Download the latest binary for your OS/architecture from the [releases page][lat
 Supported image architectures - `linux/amd64`, `linux/arm/v7`, `linux/arm64`, `linux/ppc64le`, `linux/s390x`.
 All images are signed with [Cosign][cosign] using keyless signing (GitHub OIDC).
 
+**Docker Image Content**:
+
+```text
+Permission     UID:GID       Size  Filetree
+---------- -------------  -------  -----------------------------------
+drwxr-xr-x         0:0     7.1 MB  ├── bin
+-rwxr-xr-x         0:0     6.6 MB  │   ├── 3proxy
+-rwxr-xr-x         0:0      64 kB  │   ├── dumb-init
+-rwxr-xr-x         0:0     338 kB  │   ├── lua
+-rwxr-xr-x         0:0      63 kB  │   └── portcheck
+-rwxr-xr-x         0:0     8.9 kB  ├── entrypoint.lua
+drwxr-xr-x         0:0     218 kB  ├── etc
+drwxr-xr-x 10001:10001        0 B  │   ├── 3proxy
+-rw-r--r--         0:0       16 B  │   ├── group
+-rw-r--r--         0:0       49 B  │   ├── passwd
+drwxr-xr-x         0:0     218 kB  │   └── ssl
+drwxr-xr-x         0:0     218 kB  │       └── certs
+-rw-r--r--         0:0     218 kB  │           └── ca-certificates.crt
+drwxrwxrwt         0:0        0 B  └── tmp
+```
+
 ### 📦 Helm chart
 
 A Helm chart for Kubernetes is included with each release ([download][latest-helm-chart]), published on
