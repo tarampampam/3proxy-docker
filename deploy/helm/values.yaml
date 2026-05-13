@@ -1,0 +1,150 @@
+# -- (string/null) Override the full name used for all Kubernetes resources (Deployment, Service, …)
+fullnameOverride: null
+# -- (string/null) Override the chart name used when constructing resource names
+nameOverride: null
+# -- (string/null) Override the default Release Namespace for Helm
+namespaceOverride: null
+
+image:
+  # -- The image repository to pull from
+  repository: ghcr.io/tarampampam/3proxy
+  # -- Defines the image pull policy
+  pullPolicy: IfNotPresent
+  # -- (string/null) Overrides the image tag whose default is the chart appVersion
+  tag: null
+
+deployment:
+  # -- Enable deployment (`deployment.yaml` is not rendered when disabled)
+  enabled: true
+  # -- Workload kind - `Deployment` or `DaemonSet`
+  kind: Deployment
+  # -- How many replicas to run (**ignored when `kind` is `DaemonSet`**)
+  replicas: 1
+  # -- Deployment update strategy (applies only when `kind` is `Deployment`). More information can be
+  # [found here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy)
+  strategy: {}
+  # -- DaemonSet update strategy (applies only when `kind` is `DaemonSet`). More information can be
+  # [found here](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#daemonset-update-strategy)
+  updateStrategy: {}
+  # -- Additional pod annotations (e.g. for mesh injection or Prometheus scraping, supports templating). More
+  # information can be [found here](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+  # -- Additional workload labels (e.g. for filtering by custom labels; supports templating)
+  labels: {}
+  # -- Secrets for pulling an image from a private repository (supports templating), more information can be
+  # [found here](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+  imagePullSecrets: []
+  # -- Security context for the pod, more information can be
+  # [found here](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-1).
+  # To disable the securityContext block entirely, set this to `null` (not `{}`; an empty map is merged with these
+  # defaults by Helm and does not clear them).
+  # @default -- *non-root, read-only fs, no privilege escalation*
+  securityContext:
+    runAsNonRoot: true              # refuse to start if the image tries to run as root
+    runAsUser: 10001                # UID defined in the Dockerfile
+    runAsGroup: 10001               # GID defined in the Dockerfile
+    readOnlyRootFilesystem: true    # /etc/3proxy and /tmp are always mounted as emptyDir volumes
+    allowPrivilegeEscalation: false # prevent setuid/setcap privilege escalation
+    capabilities: {drop: [ALL]}     # drop all Linux capabilities; the proxy needs none
+    seccompProfile: {type: RuntimeDefault} # restrict syscalls to the default allowlist
+  probe:
+    # -- Named port to probe - `proxy` or `socks`
+    port: proxy
+    # -- How often (in seconds) to perform the probe
+    interval: 10
+    # -- Number of seconds after the container has started before liveness probes are initiated
+    initialDelay: 2
+  # -- Resource limits and requests, more information can be
+  # [found here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  # @default -- *memory: 16/128Mi*
+  resources:
+    requests: {memory: 16Mi}
+    limits: {memory: 128Mi}
+  # -- Additional volumes to add to the pod (supports templating), more information can be
+  # [found here](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumes: []
+  # -- Additional volumeMounts to add to the container (supports templating)
+  volumeMounts: []
+  # -- Node selector for pod assignment (supports templating), more information can be
+  # [found here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
+  nodeSelector: {}
+  # -- Affinity for pod assignment (supports templating), more information can be
+  # [found here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
+  affinity: {}
+  # -- Tolerations for pod assignment (supports templating), more information can be
+  # [found here](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  tolerations: []
+  # -- Topology spread constraints for pod distribution across nodes/zones (supports templating), more information
+  # can be [found here](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+  topologySpreadConstraints: []
+  # -- Additional environment variables to set in the container (supports templating)
+  env: []
+  # -- Additional arguments to pass to the container (supports templating)
+  args: []
+
+service:
+  # -- Enable service (`service.yaml` is not rendered when disabled)
+  enabled: true
+  # -- Additional service annotations (e.g. for MetalLB, monitoring or service discovery; supports templating)
+  annotations: {}
+  # -- Service type, more information can be
+  # [found here](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+  type: ClusterIP
+  # -- External DNS hostname for `type: ExternalName` - required when `type` is `ExternalName`
+  externalName: null
+  # -- Restrict load-balancer access to specific CIDR ranges (works only with `type: LoadBalancer`)
+  loadBalancerSourceRanges: []
+  # -- Service-level ports. `targetPort` resolves by named port from the container spec, so altering
+  # `config.ports.*` keeps `targetPort` in sync without touching this section.
+  ports:
+    # -- Service port for the HTTP/HTTPS CONNECT proxy (maps to the `proxy` named containerPort)
+    proxy: 3128
+    # -- Service port for the SOCKS4/5 proxy (maps to the `socks` named containerPort)
+    socks: 1080
+
+config:
+  log:
+    # -- Enable logging; set to `false` to redirect output to `/dev/null`
+    enabled: true
+    # -- (string/null) Log output destination: a file path, `/dev/stdout`, `/dev/null`, etc.
+    # @default -- `/dev/stdout`
+    output: null
+
+  auth:
+    # -- (string/null) Username for proxy authentication. To read from a Secret or ConfigMap instead, leave this
+    # `null` and inject `PROXY_LOGIN` via `deployment.env` using `valueFrom` (see the README for examples).
+    login: null
+    # -- (string/null) Password for proxy authentication. To read from a Secret or ConfigMap instead, leave this
+    # `null` and inject `PROXY_PASSWORD` via `deployment.env` using `valueFrom` (see the README for examples).
+    password: null
+    # -- ([]object/null) Additional accounts as a list of `{login, password}` objects. Auth must be enabled
+    # (login + password set). To source extra accounts from a Secret or ConfigMap, leave this empty and inject
+    # `EXTRA_ACCOUNTS` (formatted as `login:pass;login2:pass2`) via `deployment.env` using `valueFrom`
+    # (see the README for examples).
+    extraAccounts: [] # Array<{login: string, password: string}>
+
+  dns:
+    # -- (string/null) Primary DNS resolver address
+    # @default -- `1.0.0.1` (Cloudflare)
+    primaryResolver: null
+    # -- (string/null) Secondary DNS resolver address
+    # @default -- `8.8.4.4` (Google)
+    secondaryResolver: null
+    # -- (integer/null) DNS response cache table size in entries (minimum 256)
+    # @default -- `65536`
+    cacheSize: null
+
+  ports:
+    # -- HTTP/HTTPS CONNECT proxy listen port; sets the `PROXY_PORT` env var and the `proxy` containerPort
+    proxy: 3128
+    # -- SOCKS4/5 proxy listen port; sets the `SOCKS_PORT` env var and the `socks` containerPort
+    socks: 1080
+
+  limits:
+    # -- (integer/null) Maximum number of simultaneous connections per service
+    # @default -- `512`
+    maxConnections: null
+
+  # -- (string/null) Additional 3proxy configuration lines appended after the main config block but before
+  # `proxy`/`socks`/`flush`. Use `\\n` as a line separator when passing via `--set`.
+  extraConfig: null

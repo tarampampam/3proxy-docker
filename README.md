@@ -17,149 +17,194 @@
 
 # Docker image with [3proxy][link_3proxy]
 
-3proxy is a powerful and lightweight proxy server. This image includes the stable version and can be easily
-configured using environment variables. By default, it operates with anonymous proxy settings to hide client
-information and logs activity in JSON format.
+[3proxy][link_3proxy] is a tiny, battle-tested proxy server with 20+ years in production. It speaks HTTP/HTTPS,
+SOCKSv4/5, FTP, SMTP, supports IPv4/IPv6, DNS caching, ACLs, proxy chaining, load balancing, and a plugin
+system - all in a single lightweight binary, written in pure C.
 
-> Page on `hub.docker.com` can be [found here][link_docker_hub].
+This repository ships the **stable version** of 3proxy as a Docker image with a set of practical improvements
+over the vanilla upstream build:
 
-TCP ports:
+- **Environment-variable configuration** - large set of options are exposed as an env vars; no config file needed,
+  making it a proper container citizen from day one
+- **Scratch-based image** - no OS, no package manager, no shell; just the binary and nothing else, minimizing
+  the attack surface and image size
+- **Single static binary with bundled plugins** - statically linked, key plugins included; zero shared-library
+  dependencies, runs anywhere
+- **Styled error pages** - proxy error responses come with a clean, dark-themed UI instead of the default
+  spartan HTML
+- **`dumb-init` included** - signals from Docker and other container runtimes are forwarded correctly; no orphaned
+  child processes
+- **Built-in healthcheck** - the container reports its own health to the runtime out of the box
+- **Lua entrypoint** - startup logic lives in a readable Lua script, easy to extend without rebuilding
+- **Multi-arch images** - `amd64`, `arm64`, `arm/v7`, `ppc64le`, `s390x`
+- **Pre-compiled releases** - every GitHub release ships standalone 3proxy binaries for common OSes, ready to
+  use without Docker
+- **Helm chart** - production-ready chart with security-first defaults: non-root, minimal pod permissions,
+  only what 3proxy actually needs granted by default
+- **Structured JSON logs** - log output is JSON-formatted out of the box, ready to be ingested by any log
+  aggregator without extra parsing
+- **No forwarding headers** - the HTTP proxy runs in anonymous mode (`-a`): `X-Forwarded-For` and `Via` are
+  never added, so the destination server sees a direct request rather than a proxied one
 
-| Port number | Description                                             |
-|-------------|---------------------------------------------------------|
-| `3128`      | [HTTP proxy](https://3proxy.org/doc/man8/proxy.8.html)  |
-| `1080`      | [SOCKS proxy](https://3proxy.org/doc/man8/socks.8.html) |
+## 🪂 Supported Environment Variables
 
-## Supported tags
+| Variable Name        | Description                                                                           | Example                |
+|----------------------|---------------------------------------------------------------------------------------|------------------------|
+| `LOG_OUTPUT`         | Path for log output (`/dev/stdout` by default; set to `/dev/null` to disable logging) | `/tmp/3proxy.log`      |
+| `PRIMARY_RESOLVER`   | Primary DNS resolver (`1.0.0.1` by default)                                           | `8.8.8.8:5353/tcp`     |
+| `SECONDARY_RESOLVER` | Secondary DNS resolver (`8.8.4.4` by default)                                         | `2001:4860:4860::8844` |
+| `MAX_CONNECTIONS`    | Maximum number of connections (`512` by default); requires `ulimit nofile` ≥ 2×value  | `2056`                 |
+| `DNS_CACHE_SIZE`     | DNS cache size (`65536` by default)                                                   | `5000`                 |
+| `PROXY_LOGIN`        | Authorization login (empty by default)                                                | `username`             |
+| `PROXY_PASSWORD`     | Authorization password (empty by default)                                             | `password`             |
+| `PROXY_PORT`         | **HTTP** proxy port (`3128` by default)                                               | `8080`                 |
+| `SOCKS_PORT`         | **SOCKS** proxy port (`1080` by default)                                              | `8888`                 |
+| `EXTRA_ACCOUNTS`     | Additional proxy users (format `login:password;login2:password2`, empty by default)   | `evil:live;guest:pass` |
+| `EXTRA_CONFIG`       | Raw 3proxy config lines injected before `proxy`/`socks` directives (empty by default) | `# line 1\\n# line 2`  |
 
-| Registry                               | Image                        |
-|----------------------------------------|------------------------------|
-| [GitHub Container Registry][link_ghcr] | `ghcr.io/tarampampam/3proxy` |
-| [Docker Hub][link_docker_hub] (mirror) | `tarampampam/3proxy`         |
+## 🚀 Installation
 
-> [!NOTE]
-> It’s recommended to avoid using the `latest` tag, as **major** upgrades may include breaking changes.
-> Instead, use specific tags in `X.Y.Z` format for version consistency.
+Download the latest binary for your OS/architecture from the [releases page][latest-release], or use the Docker image:
 
-All supported image tags can be [found here][link_docker_tags].
+| Registry                          | Image                        |
+|-----------------------------------|------------------------------|
+| [GitHub Container Registry][ghcr] | `ghcr.io/tarampampam/3proxy` |
+| [Quay.io][quay] (mirror)          | `quay.io/tarampampam/3proxy` |
+| [Docker Hub][docker-hub] (mirror) | `tarampampam/3proxy`         |
 
-> Starting with version 1.8.2, the `arm64` architecture is supported (in addition to `amd64`):
+> [!WARNING]
+> Using the `latest` tag for Docker images is strongly discouraged, as it may introduce backward-incompatible changes
+> during **major** upgrades. Use versioned tags in the `X`, `X.Y`, or `X.Y.Z` format instead.
 
-<details>
-  <summary><strong><code>docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.8.2</code></strong></summary>
+Supported image architectures - `linux/amd64`, `linux/arm/v7`, `linux/arm64`, `linux/ppc64le`, `linux/s390x`.
+All images are signed with [Cosign][cosign] using keyless signing (GitHub OIDC).
+
+### 📦 Helm chart
+
+A Helm chart for Kubernetes is included with each release ([download][latest-helm-chart]), published on
+[Artifact Hub][artifacthub], and also available via an OCI registry (Helm v3.8+ required):
 
 ```shell
-Image: ghcr.io/tarampampam/3proxy:1.8.2
- * Manifest List: Yes (Image type: application/vnd.docker.distribution.manifest.list.v2+json)
- * Supported platforms:
-   - linux/amd64
-   - linux/arm64
+helm install the3proxy \
+  oci://ghcr.io/tarampampam/3proxy/charts/the3proxy \
+  --version X.Y.Z
 ```
 
-</details>
+All supported chart values, examples, and usage instructions can be found at [Artifact Hub][artifacthub].
 
-> Starting with version 1.12.1, the following architectures are supported: `arm/v6`, `arm/v7`, `ppc64le`, `s390x`
-> (in addition to `amd64`, `arm64`):
+> Helm chart sources are located in the [deploy/helm](deploy/helm) directory of the repository.
 
-<details>
-  <summary><strong><code>docker run --rm mplatform/mquery ghcr.io/tarampampam/3proxy:1.12.1</code></strong></summary>
+[latest-release]:https://github.com/tarampampam/3proxy-docker/releases/latest
+[ghcr]:https://github.com/users/tarampampam/packages/container/package/3proxy
+[docker-hub]:https://hub.docker.com/r/tarampampam/3proxy
+[quay]:https://quay.io/repository/tarampampam/3proxy?tab=tags
+[cosign]:https://github.com/sigstore/cosign
+[latest-helm-chart]:https://github.com/tarampampam/3proxy-docker/releases/latest/download/helm-chart.tgz
+[artifacthub]:https://artifacthub.io/packages/helm/the3proxy/the3proxy
+
+## 🛠 Usage examples
+
+### Open proxy (no authentication)
+
+Starts HTTP and SOCKS5 proxies on their default ports with no credentials required. Anyone who can reach
+the ports can use the proxy, so only do this on a trusted/private network.
 
 ```shell
-Image: ghcr.io/tarampampam/3proxy:1.12.1
- * Manifest List: Yes (Image type: application/vnd.oci.image.index.v1+json)
- * Supported platforms:
-   - linux/amd64
-   - linux/arm/v6
-   - linux/arm/v7
-   - linux/arm64
-   - linux/ppc64le
-   - linux/s390x
-```
-
-</details>
-
-## Supported Environment Variables
-
-| Variable Name        | Description                                                                                                           | Example                           |
-|----------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------|
-| `PROXY_LOGIN`        | Authorization login (empty by default)                                                                                | `username`                        |
-| `PROXY_PASSWORD`     | Authorization password (empty by default)                                                                             | `password`                        |
-| `EXTRA_ACCOUNTS`     | Additional proxy users (JSON object format)                                                                           | `{"evil":"live", "guest":"pass"}` |
-| `PRIMARY_RESOLVER`   | Primary DNS resolver (`1.0.0.1` by default)                                                                           | `8.8.8.8:5353/tcp`                |
-| `SECONDARY_RESOLVER` | Secondary DNS resolver (`8.8.4.4` by default)                                                                         | `2001:4860:4860::8844`            |
-| `MAX_CONNECTIONS`    | Maximum number of connections (`1024` by default)                                                                     | `2056`                            |
-| `PROXY_PORT`         | HTTP proxy port (`3128` by default)                                                                                   | `8080`                            |
-| `SOCKS_PORT`         | SOCKS proxy port (`1080` by default)                                                                                  | `8888`                            |
-| `EXTRA_CONFIG`       | Additional 3proxy configuration (appended to the **end** of the config file, but before `proxy` and `flush`)          | `# line 1\n# line 2`              |
-| `LOG_OUTPUT`         | Path for log output (`/dev/stdout` by default; set to `/dev/null` to disable logging)                                 | `/tmp/3proxy.log`                 |
-
-## Helm Chart
-
-To install it on Kubernetes (K8s), please use the Helm chart from [ArtifactHUB][artifact-hub].
-
-[artifact-hub]:https://artifacthub.io/packages/helm/proxy-3proxy/proxy-3proxy
-
-## How to Use This Image
-
-Example usage:
-
-```bash
 docker run --rm -d \
   -p "3128:3128/tcp" \
   -p "1080:1080/tcp" \
-  ghcr.io/tarampampam/3proxy:1
+  ghcr.io/tarampampam/3proxy:2
 ```
 
-With authentication and custom resolver settings:
+### Protected proxy (login + password)
 
-```bash
+Enables basic username/password authentication. Requests without valid credentials receive
+`407 Proxy Authentication Required`. Also sets a custom primary DNS resolver.
+
+```shell
 docker run --rm -d \
   -p "3128:3128/tcp" \
   -p "1080:1080/tcp" \
-  -e "PROXY_LOGIN=evil" \
-  -e "PROXY_PASSWORD=live" \
+  -e "PROXY_LOGIN=user" \
+  -e "PROXY_PASSWORD=secret" \
   -e "PRIMARY_RESOLVER=2001:4860:4860::8888" \
-  ghcr.io/tarampampam/3proxy:1
+  ghcr.io/tarampampam/3proxy:2
 ```
 
-Docker compose example:
+### Docker Compose
+
+Runs the proxy on custom ports with authentication and a higher connection limit. Because each connection
+needs two file descriptors, `MAX_CONNECTIONS: 10000` requires `ulimit nofile` to be at least `20000`.
 
 ```yaml
 services:
   3proxy:
-    image: ghcr.io/tarampampam/3proxy:1
+    image: ghcr.io/tarampampam/3proxy:2
     environment:
       PROXY_LOGIN: evil
       PROXY_PASSWORD: live
       MAX_CONNECTIONS: 10000
-      PROXY_PORT: 8000
-      SOCKS_PORT: 8001
-      PRIMARY_RESOLVER: 77.88.8.8
+      PROXY_PORT: 8080
+      SOCKS_PORT: 1080
+      PRIMARY_RESOLVER: 1.0.0.1
       SECONDARY_RESOLVER: 8.8.8.8
     ports:
-      - '8000:8000/tcp'
-      - '8001:8001/tcp'
+      - '8080:8080/tcp'
+      - '1080:1080/tcp'
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 20000
 ```
 
-## Releasing
+## 🔧 Development
 
-Publishing a new version is straightforward:
+### Requirements
 
-1. Make the necessary changes in this repository.
-2. "Publish" a new release on the repository's releases page.
+- [docker](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script) for building and
+  testing the Docker image locally
+- Optional: [helm](https://helm.sh/docs/intro/install/) + [kind](https://kind.sigs.k8s.io/docs/user/quick-start/) + docker
+  for testing the Helm chart locally in Kubernetes
+- Optional: [helm-docs](https://github.com/norwoodj/helm-docs/releases/latest) for generating Helm chart documentation
 
-Docker images will be automatically built and published.
+**Commands**:
 
-> Note: The `latest` tag will be overwritten in both registries when a new release is published.
+```shell
+# build the image locally
+docker build --tag 3proxy:local .
 
-## Support
+# run the locally built image and smoke-test both proxies
+docker run --rm -d --name 3proxy_local -p "3128:3128/tcp" -p "1080:1080/tcp" 3proxy:local
+curl -sx http://localhost:3128 https://httpbin.org/ip  # HTTP proxy
+curl -sx socks5://localhost:1080 https://httpbin.org/ip # SOCKS5 proxy
+docker stop 3proxy_local
+
+# lint the Helm chart
+helm lint --strict ./deploy/helm
+
+# regenerate Helm chart README from the template (requires helm-docs)
+helm-docs -c ./deploy/helm/ -t README.tpl.md -o README.md
+
+# test the Helm chart in a local kind cluster
+kind create cluster --name 3proxy-dev
+kind load docker-image 3proxy:local --name 3proxy-dev
+helm install the3proxy ./deploy/helm \
+  --set image.repository=3proxy --set image.tag=local \
+  --set config.auth.login=user --set config.auth.password=secret \
+  --wait
+kubectl run smoke --image=curlimages/curl:latest --restart=Never --rm -i \
+  -- curl --fail --proxy http://the3proxy:3128 --proxy-user user:secret https://httpbin.org/ip
+kind delete cluster --name 3proxy-dev
+```
+
+## 👾 Support
 
 [![Issues][badge_issues]][link_issues]
 [![Issues][badge_pulls]][link_pulls]
 
 If you encounter any issues, please [open an issue][link_create_issue] in this repository.
 
-## License
+## 📖 License
 
 This project is licensed under the WTFPL. Use it freely and enjoy!
 

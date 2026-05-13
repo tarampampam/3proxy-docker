@@ -9,11 +9,9 @@ updates:
     schedule: {interval: monthly, time: '02:00', timezone: 'Etc/UTC'}
     cooldown: {default-days: 2}
     groups: {github-actions: {patterns: ['*']}}
-    assignees: [tarampampam]
 
   - package-ecosystem: docker
     directory: /
     schedule: {interval: monthly, time: '02:00', timezone: 'Etc/UTC'}
     cooldown: {default-days: 2}
     groups: {docker: {patterns: ['*']}}
-    assignees: [tarampampam]

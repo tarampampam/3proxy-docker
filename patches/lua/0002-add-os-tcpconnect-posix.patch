@@ -1,0 +1,188 @@
+--- tmp/loslib.c.after_p1	2026-05-08 03:14:19.415310791 +0400
++++ tmp/loslib.c	2026-05-08 03:17:43.670217998 +0400
+@@ -16,6 +16,13 @@
+ #include <string.h>
+ #include <time.h>
+ 
++#if defined(LUA_USE_POSIX)
++#include <fcntl.h>
++#include <netdb.h>
++#include <sys/select.h>
++#include <sys/socket.h>
++#endif
++
+ #include "lua.h"
+ 
+ #include "lauxlib.h"
+@@ -222,6 +229,163 @@
+ #endif
+ 
+ 
++#if defined(LUA_USE_POSIX)
++// os.tcpconnect(host, port [, timeout_ms]) -- available only when compiled with LUA_USE_POSIX
++//
++// Opens a TCP connection to host:port with an optional timeout (default: 5000 ms).
++// On success returns a readable/writable Lua file handle -- the same type io.open returns,
++// so all standard methods (:read, :write, :flush, :close) work on it as usual.
++// On error returns nil, error_message (string), errno (integer).
++//
++// Lua usage -- health check example:
++//   local f, err, code = os.tcpconnect("127.0.0.1", 3128, 3000)
++//   if not f then
++//     io.stderr:write("connect failed: " .. err .. " (errno " .. code .. ")\n")
++//     os.exit(1)
++//   end
++//   f:write("CONNECT 127.0.0.1:80 HTTP/1.1\r\nHost: 127.0.0.1:80\r\n\r\n")
++//   f:flush()
++//   local line = f:read("l")
++//   f:close()
++static int tcp_fclose (lua_State *L) {
++  luaL_Stream *p = (luaL_Stream *)luaL_checkudata(L, 1, LUA_FILEHANDLE);
++  errno = 0;
++  return luaL_fileresult(L, (fclose(p->f) == 0), NULL);
++}
++
++static int os_tcpconnect (lua_State *L) {
++  const char *host  = luaL_checkstring(L, 1);
++  int port          = (int)luaL_checkinteger(L, 2);
++  int timeout_ms    = (int)luaL_optinteger(L, 3, 5000);
++  char port_str[8];
++  struct addrinfo hints, *res;
++  int sock, ret, flags, err;
++  socklen_t errlen;
++  fd_set wfds;
++  struct timeval tv;
++  luaL_Stream *stream;
++  FILE *fp;
++
++  if (port < 1 || port > 65535) {
++    luaL_pushfail(L);
++    lua_pushstring(L, "port out of range (1-65535)");
++    lua_pushinteger(L, EINVAL);
++    return 3;
++  }
++
++  snprintf(port_str, sizeof(port_str), "%d", port);
++  memset(&hints, 0, sizeof(hints));
++  hints.ai_family   = AF_UNSPEC;
++  hints.ai_socktype = SOCK_STREAM;
++
++  ret = getaddrinfo(host, port_str, &hints, &res);
++  if (ret != 0) {
++    luaL_pushfail(L);
++    lua_pushstring(L, gai_strerror(ret));
++    lua_pushinteger(L, ret);
++    return 3;
++  }
++
++  sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
++  if (sock < 0) {
++    err = errno;
++    freeaddrinfo(res);
++    luaL_pushfail(L);
++    lua_pushstring(L, strerror(err));
++    lua_pushinteger(L, err);
++    return 3;
++  }
++
++  // Switch to non-blocking so connect() respects the timeout.
++  flags = fcntl(sock, F_GETFL, 0);
++  if (fcntl(sock, F_SETFL, flags | O_NONBLOCK) < 0) {
++    err = errno;
++    close(sock); freeaddrinfo(res);
++    luaL_pushfail(L);
++    lua_pushstring(L, strerror(err));
++    lua_pushinteger(L, err);
++    return 3;
++  }
++
++  ret = connect(sock, res->ai_addr, res->ai_addrlen);
++  freeaddrinfo(res);
++
++  if (ret < 0 && errno != EINPROGRESS) {
++    err = errno;
++    close(sock);
++    luaL_pushfail(L);
++    lua_pushstring(L, strerror(err));
++    lua_pushinteger(L, err);
++    return 3;
++  }
++
++  if (ret != 0) {
++    // Wait until the socket becomes writable (= connected) or timeout expires.
++    FD_ZERO(&wfds);
++    FD_SET(sock, &wfds);
++    tv.tv_sec  = timeout_ms / 1000;
++    tv.tv_usec = (timeout_ms % 1000) * 1000;
++
++    ret = select(sock + 1, NULL, &wfds, NULL, &tv);
++    if (ret == 0) {
++      close(sock);
++      luaL_pushfail(L);
++      lua_pushstring(L, "connection timed out");
++      lua_pushinteger(L, ETIMEDOUT);
++      return 3;
++    }
++    if (ret < 0) {
++      err = errno;
++      close(sock);
++      luaL_pushfail(L);
++      lua_pushstring(L, strerror(err));
++      lua_pushinteger(L, err);
++      return 3;
++    }
++
++    // select() succeeded -- verify the connection was actually established.
++    err = 0;
++    errlen = sizeof(err);
++    getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &errlen);
++    if (err != 0) {
++      close(sock);
++      luaL_pushfail(L);
++      lua_pushstring(L, strerror(err));
++      lua_pushinteger(L, err);
++      return 3;
++    }
++  }
++
++  // Restore blocking mode so standard FILE* I/O works as expected.
++  if (fcntl(sock, F_SETFL, flags) < 0) {
++    err = errno;
++    close(sock);
++    luaL_pushfail(L);
++    lua_pushstring(L, strerror(err));
++    lua_pushinteger(L, err);
++    return 3;
++  }
++
++  // Wrap the socket fd in a FILE* for buffered I/O, then in a Lua file handle.
++  // fclose() on a fdopen'd FILE* closes the underlying fd as well.
++  fp = fdopen(sock, "r+b");
++  if (!fp) {
++    err = errno;
++    close(sock);
++    luaL_pushfail(L);
++    lua_pushstring(L, strerror(err));
++    lua_pushinteger(L, err);
++    return 3;
++  }
++
++  stream = (luaL_Stream *)lua_newuserdatauv(L, sizeof(luaL_Stream), 0);
++  luaL_setmetatable(L, LUA_FILEHANDLE);
++  stream->f      = fp;
++  stream->closef = &tcp_fclose;
++  return 1;
++}
++#endif
++
+ static int os_remove (lua_State *L) {
+   const char *filename = luaL_checkstring(L, 1);
+   errno = 0;
+@@ -480,6 +644,7 @@
+   {"difftime",  os_difftime},
+ #if defined(LUA_USE_POSIX)
+   {"exec",      os_exec},
++  {"tcpconnect", os_tcpconnect},
+ #endif
+   {"execute",   os_execute},
+   {"exit",      os_exit},
