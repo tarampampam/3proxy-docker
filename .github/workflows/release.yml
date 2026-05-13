@@ -62,7 +62,7 @@ jobs:
           platforms: linux/amd64,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
           build-args: "APP_VERSION=${{ steps.slug.outputs.version-semantic }}"
           tags: ${{ steps.docker-tags.outputs.list }}
-      - uses: sigstore/cosign-installer@v4.1.1
+      - uses: sigstore/cosign-installer@v4.1.2
       - run: |
           cosign sign --yes \
             "${{ env.HUB_IMAGE }}@${{ steps.docker-push.outputs.digest }}" \
@@ -116,7 +116,7 @@ jobs:
       - uses: mikefarah/yq@v4
         with:
           cmd: yq -i '(.version, .appVersion) = "${{ steps.slug.outputs.version-semantic }}"' ./deploy/helm/Chart.yaml
-      - uses: losisin/helm-docs-github-action@v1
+      - uses: losisin/helm-docs-github-action@v2
         with:
           chart-search-root: ./deploy/helm
           template-files: README.tpl.md
@@ -190,7 +190,7 @@ jobs:
           DIGEST=$(oras resolve \
             "ghcr.io/tarampampam/3proxy/charts/the3proxy:${{ steps.slug.outputs.version-semantic }}")
           echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
-      - uses: sigstore/cosign-installer@v4.1.1
+      - uses: sigstore/cosign-installer@v4.1.2
       - run: |
           cosign sign --yes \
             "ghcr.io/tarampampam/3proxy/charts/the3proxy@${{ steps.push-chart.outputs.digest }}"
