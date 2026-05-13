@@ -95,7 +95,6 @@ jobs:
           docker cp app:/bin/3proxy ./dist/3proxy
           cd ./dist
           tar -czf ../release.tar.gz *
-          zip -r ../release.zip .
       - uses: gacts/github-slug@v1
         id: filename
         with: {to-slug: '${{ matrix.platform }}'}
@@ -104,12 +103,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./release.tar.gz
           asset_name: ${{ steps.filename.outputs.slug }}.tar.gz
-          tag: ${{ github.ref }}
-      - uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./release.zip
-          asset_name: ${{ steps.filename.outputs.slug }}.zip
           tag: ${{ github.ref }}
 
   build-helm-chart:
