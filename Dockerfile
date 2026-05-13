@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     && cd /tmp/lua \
     && for f in /mnt/patches/*.patch; do patch -p1 < "$f"; done \
     && make lua \
-      MYCFLAGS="-std=c99 -Os -DLUA_USE_POSIX -ffunction-sections -fdata-sections" \
+      CFLAGS="-std=c99 -Os -DLUA_USE_POSIX -ffunction-sections -fdata-sections" \
       MYLDFLAGS="-static -Wl,--gc-sections" \
       MYLIBS="" \
     && strip ./lua \

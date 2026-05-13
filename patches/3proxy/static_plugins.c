@@ -34,5 +34,4 @@ void *dlsym(void *handle, const char *sym) {
     return NULL;
 }
 
-char *dlerror(void) { return NULL; }
-int   dlclose(void *handle) { (void)handle; return 0; }
+int dlclose(void *handle) { (void)handle; return 0; }

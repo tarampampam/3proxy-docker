@@ -85,9 +85,22 @@ jobs:
       - name: Install the chart
         run: |
           helm install 3proxy ./deploy/helm \
+            --wait \
             --set image.repository=3proxy \
-            --set image.tag=ci
-      # TODO: add some smoke tests here, e.g. check if the pod is running, check if the service is responding, etc.
+            --set image.tag=ci \
+            --set 'config.auth.login=evil' \
+            --set 'config.auth.password=live'
+      - name: Smoke-test the deployment
+        run: |
+          kubectl run smoke-test \
+            --image=curlimages/curl:latest \
+            --restart=Never --rm -i \
+            -- curl -s -o /dev/null --fail \
+              --proxy http://3proxy:3128 \
+              --proxy-user evil:live \
+              --connect-timeout 5 \
+              --max-time 10 \
+              https://www.cloudflare.com/robots.txt
 
   try-to-use:
     name: Try to use the docker image (auth ${{ matrix.auth }})
