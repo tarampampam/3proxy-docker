@@ -44,7 +44,6 @@ jobs:
       matrix:
         platform:
           - linux/amd64
-          - linux/arm/v6
           - linux/arm/v7
           - linux/arm64
           - linux/ppc64le
@@ -75,9 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v8
-        with:
-          name: docker-image
-          path: ${{ runner.temp }}
+        with: {name: docker-image, path: "${{runner.temp}}"}
       - run: docker load -i ${{ runner.temp }}/image.tar
       - uses: helm/kind-action@v1
       - run: kind load docker-image 3proxy:ci --name chart-testing
@@ -95,73 +92,72 @@ jobs:
           kubectl run smoke-test \
             --image=curlimages/curl:latest \
             --restart=Never --rm -i \
-            -- curl -s -o /dev/null --fail \
+            -- curl --fail \
               --proxy http://the3proxy:3128 \
               --proxy-user evil:live \
               --connect-timeout 5 \
               --max-time 10 \
               https://www.cloudflare.com/robots.txt
 
-  try-to-use:
-    name: Try to use the docker image (auth ${{ matrix.auth }})
+  use-without-auth:
+    name: Use the docker image without auth
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        auth: [yes, no]
     needs: [build-docker-image]
     steps:
       - uses: actions/download-artifact@v8
-        with:
-          name: docker-image
-          path: ${{ runner.temp }}
-      - run: docker load -i ${{ runner.temp }}/image.tar
-      - if: matrix.auth != 'yes'
-        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" 3proxy:ci
-      - if: matrix.auth == 'yes'
-        run: docker run --rm -d -p "3128:3128/tcp" -p "1080:1080/tcp" -e "PROXY_LOGIN=evil" -e "PROXY_PASSWORD=live" -e 'EXTRA_ACCOUNTS=foo:bar' 3proxy:ci
-      - run: sleep 3 # TODO: replace with a proper health check
-      - name: Try to use HTTP proxy
-        if: matrix.auth != 'yes'
-        run: |
+        with: {name: docker-image, path: "${{ runner.temp }}"}
+      - run: docker load --input ${{ runner.temp }}/image.tar
+      - run: docker run --rm -d --name the3proxy -p "3128:3128/tcp" -p "1080:1080/tcp" 3proxy:ci
+      - uses: stringbean/docker-healthcheck-action@v3
+        with: {container: the3proxy, wait-time: 10, require-healthy: true}
+      - run: |
           curl -v --fail \
             --proxy http://127.0.0.1:3128 \
             --connect-timeout 3 \
             --max-time 3 \
             https://www.cloudflare.com/robots.txt
-      - name: Try to use SOCKS proxy
-        if: matrix.auth != 'yes'
-        run: |
+      - run: |
           curl -v --fail \
             --proxy socks5://127.0.0.1:1080 \
             --connect-timeout 3 \
             --max-time 3 \
             https://www.cloudflare.com/robots.txt
-      - name: Try to use HTTP proxy (with auth)
-        if: matrix.auth == 'yes'
-        run: |
+      - run: docker stop the3proxy
+
+  use-with-auth:
+    name: Use the docker image with auth
+    runs-on: ubuntu-latest
+    needs: [build-docker-image]
+    steps:
+      - uses: actions/download-artifact@v8
+        with: {name: docker-image, path: "${{ runner.temp }}"}
+      - run: docker load --input ${{ runner.temp }}/image.tar
+      - run: |
+          docker run --rm -d --name the3proxy \
+            -p "3128:3128/tcp" -p "1080:1080/tcp" \
+            -e "PROXY_LOGIN=evil" -e "PROXY_PASSWORD=live" -e 'EXTRA_ACCOUNTS=foo:bar' \
+              3proxy:ci
+      - uses: stringbean/docker-healthcheck-action@v3
+        with: {container: the3proxy, wait-time: 10, require-healthy: true}
+      - run: |
           curl -v --fail \
             --proxy http://127.0.0.1:3128 \
             --proxy-user evil:live \
             --connect-timeout 3 \
             --max-time 3 \
             https://www.cloudflare.com/robots.txt
-      - name: Try to use HTTP proxy (with auth, extra user)
-        if: matrix.auth == 'yes'
-        run: |
+      - run: |
           curl -v --fail \
             --proxy http://127.0.0.1:3128 \
             --proxy-user foo:bar \
             --connect-timeout 3 \
             --max-time 3 \
             https://www.cloudflare.com/robots.txt
-      - name: Try to use SOCKS proxy (with auth)
-        if: matrix.auth == 'yes'
-        run: |
+      - run: |
           curl -v --fail \
             --proxy socks5://127.0.0.1:1080 \
             --proxy-user evil:live \
             --connect-timeout 3 \
             --max-time 3 \
             https://www.cloudflare.com/robots.txt
-      - run: docker stop $(docker ps -a --filter ancestor=3proxy:ci -q)
+      - run: docker stop the3proxy
