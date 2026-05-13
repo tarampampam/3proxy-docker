@@ -2,11 +2,11 @@
 
 ```shell
 # Install a specific version
-helm install 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy \
+helm install 3proxy oci://ghcr.io/tarampampam/3proxy-docker/charts/3proxy-docker \
   --version {{ template "chart.version" . }}
 
 # Install with custom values file
-helm install 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy \
+helm install 3proxy oci://ghcr.io/tarampampam/3proxy-docker/charts/3proxy-docker \
   --version {{ template "chart.version" . }} \
   --values my-values.yaml
 ```
@@ -14,7 +14,7 @@ helm install 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy \
 ## Upgrading
 
 ```shell
-helm upgrade 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy
+helm upgrade 3proxy oci://ghcr.io/tarampampam/3proxy-docker/charts/3proxy-docker
 ```
 
 ## Use cases
@@ -35,7 +35,7 @@ config:
 Via `--set`:
 
 ```shell
-helm install 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy \
+helm install 3proxy oci://ghcr.io/tarampampam/3proxy-docker/charts/3proxy-docker \
   --version {{ template "chart.version" . }} \
   --set 'config.auth.login=evil' \
   --set 'config.auth.password=live'
@@ -164,7 +164,7 @@ config:
 Via `--set` - use `\\n` (double backslash) as the line separator:
 
 ```shell
-helm install 3proxy oci://ghcr.io/tarampampam/3proxy/charts/3proxy \
+helm install 3proxy oci://ghcr.io/tarampampam/3proxy-docker/charts/3proxy-docker \
   --version {{ template "chart.version" . }} \
   --set 'config.extraConfig=allow * * 10.0.0.0/8\\ndeny *'
 ```

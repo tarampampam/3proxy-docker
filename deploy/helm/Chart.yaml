@@ -3,7 +3,8 @@
 apiVersion: v2
 name: 3proxy
 description: |
-  Powerful and lightweight proxy server — HTTP/HTTPS CONNECT and SOCKS4/5 in a single minimal container image
+  Powerful and lightweight proxy server (3proxy) - HTTP/HTTPS CONNECT and SOCKS4/5 in a single minimal
+  container image
 type: application
 version: 0.0.0 # will be replaced by the release workflow
 appVersion: 0.0.0 # will be replaced by the release workflow
