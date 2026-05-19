@@ -178,6 +178,65 @@ services:
         hard: 20000
 ```
 
+## ⚙️ Advanced customization
+
+### Custom 3proxy config file
+
+If `/etc/3proxy/3proxy.cfg` exists when the container starts, the entrypoint skips config generation entirely and
+passes the file directly to 3proxy. All env-var settings are ignored in this case.
+
+**Docker CLI:**
+
+```shell
+docker run --rm -d \
+  -p "3128:3128/tcp" \
+  -p "1080:1080/tcp" \
+  -v "$(pwd)/3proxy.cfg:/etc/3proxy/3proxy.cfg:ro" \
+  ghcr.io/tarampampam/3proxy:2
+```
+
+**Docker Compose:**
+
+```yaml
+services:
+  3proxy:
+    image: ghcr.io/tarampampam/3proxy:2
+    volumes:
+      - ./3proxy.cfg:/etc/3proxy/3proxy.cfg:ro
+    ports:
+      - '3128:3128/tcp'
+      - '1080:1080/tcp'
+```
+
+### Custom entrypoint script
+
+The startup logic lives in `/entrypoint.lua` (a Lua 5.5 script). You can replace it by mounting your own file over
+that path, or by passing a different `CMD`.
+
+**Mount a custom Lua entrypoint (Docker CLI):**
+
+```shell
+docker run --rm -d \
+  -p "3128:3128/tcp" \
+  -v "$(pwd)/my-entrypoint.lua:/entrypoint.lua:ro" \
+  ghcr.io/tarampampam/3proxy:2
+```
+
+**Override CMD with a script at an arbitrary path (Docker Compose):**
+
+```yaml
+services:
+  3proxy:
+    image: ghcr.io/tarampampam/3proxy:2
+    volumes:
+      - ./my-entrypoint.lua:/my-entrypoint.lua:ro
+    command: ["/bin/lua", "/my-entrypoint.lua"]
+    ports:
+      - '3128:3128/tcp'
+```
+
+> The original `entrypoint.lua` in this repository is a good starting point - copy and adapt it to your needs.
+
 ## 🔧 Development
 
 ### Requirements
