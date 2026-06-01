@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # -✂- this stage is used to compile lua binary (~230KiB) --------------------------------------------------------------
-FROM docker.io/library/alpine:3.23 AS lua
+FROM docker.io/library/alpine:3.23.4 AS lua
 
 # renovate: source=github-tags name=lua/lua
 ARG LUA_VERSION=5.5.0
@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     && /bin/lua -v
 
 # -✂- this stage is used to compile dumb-init (~62KiB) ---------------------------------------------------------------
-FROM docker.io/library/alpine:3.23 AS dumb-init
+FROM docker.io/library/alpine:3.23.4 AS dumb-init
 
 # renovate: source=github-tags name=Yelp/dumb-init
 ARG DUMB_INIT_VERSION=1.2.5
@@ -49,7 +49,7 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     && /bin/dumb-init -V
 
 # -✂- this stage is used to compile 3proxy itself (~6.3MiB) -----------------------------------------------------------
-FROM docker.io/library/alpine:3.23 AS the3proxy
+FROM docker.io/library/alpine:3.23.4 AS the3proxy
 
 # renovate: source=github-tags name=3proxy/3proxy
 ARG THE3PROXY_VERSION=0.9.6
@@ -107,7 +107,7 @@ pre-wrap;word-break:break-word}</style>\1~' ./src/proxy.c \
     && rm -rf /tmp/3proxy
 
 # -✂- and this stage is used to prepare the root filesystem for the final image ---------------------------------------
-FROM docker.io/library/alpine:3.23 AS rootfs
+FROM docker.io/library/alpine:3.23.4 AS rootfs
 
 WORKDIR /tmp/rootfs
 RUN --mount=type=bind,from=lua,source=/bin/lua,target=/mnt/lua \
