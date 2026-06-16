@@ -14,6 +14,8 @@ local ENV_PROXY_PORT         = "PROXY_PORT"
 local ENV_SOCKS_PORT         = "SOCKS_PORT"
 local ENV_EXTRA_ACCOUNTS     = "EXTRA_ACCOUNTS"
 local ENV_EXTRA_CONFIG       = "EXTRA_CONFIG"
+local ENV_PROXY_EXTRA_ARGS   = "PROXY_EXTRA_ARGS"
+local ENV_SOCKS_EXTRA_ARGS   = "SOCKS_EXTRA_ARGS"
 
 -- Returns os.getenv(name), or default when the variable is unset or empty.
 --
@@ -93,6 +95,8 @@ else
   local socks_port         = getenv(ENV_SOCKS_PORT,         "1080")
   local extra_accounts     = parse_extra_accounts(getenv(ENV_EXTRA_ACCOUNTS, ""))
   local extra_config       = getenv(ENV_EXTRA_CONFIG, ""):gsub("\\n", "\n") -- expand literal \n
+  local proxy_extra_args   = getenv(ENV_PROXY_EXTRA_ARGS, "")
+  local socks_extra_args   = getenv(ENV_SOCKS_EXTRA_ARGS, "")
 
   -- validate numeric inputs at the environment boundary
   if not is_positive_int(proxy_port, 65535) then
@@ -199,9 +203,9 @@ else
 
   toConfig("")
   -- HTTP/HTTPS CONNECT proxy; -a = anonymous mode (strips X-Forwarded-For etc.), -p = port
-  toConfig("proxy -a -p" .. proxy_port)
+  toConfig("proxy -a -p" .. proxy_port .. (proxy_extra_args ~= "" and " " .. proxy_extra_args or ""))
   -- SOCKS4/5 proxy; -a = anonymous mode, -p = port
-  toConfig("socks -a -p" .. socks_port)
+  toConfig("socks -a -p" .. socks_port .. (socks_extra_args ~= "" and " " .. socks_extra_args or ""))
   toConfig("")
   -- each service (proxy/socks) deep-copies conf.acl at definition time, so flush does not affect
   -- running services; it resets the ACL template for any service defined below and ensures a

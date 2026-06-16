@@ -290,6 +290,12 @@
         },
         "extraConfig": {
           "oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]
+        },
+        "proxyExtraArgs": {
+          "oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]
+        },
+        "socksExtraArgs": {
+          "oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]
         }
       }
     }
