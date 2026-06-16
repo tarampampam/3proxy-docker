@@ -48,19 +48,21 @@ over the vanilla upstream build:
 
 ## 🪂 Supported Environment Variables
 
-| Variable Name        | Description                                                                           | Example                |
-|----------------------|---------------------------------------------------------------------------------------|------------------------|
-| `LOG_OUTPUT`         | Path for log output (`/dev/stdout` by default; set to `/dev/null` to disable logging) | `/tmp/3proxy.log`      |
-| `PRIMARY_RESOLVER`   | Primary DNS resolver (`1.0.0.1` by default)                                           | `8.8.8.8:5353/tcp`     |
-| `SECONDARY_RESOLVER` | Secondary DNS resolver (`8.8.4.4` by default)                                         | `2001:4860:4860::8844` |
-| `MAX_CONNECTIONS`    | Maximum number of connections (`512` by default); requires `ulimit nofile` ≥ 2×value  | `2056`                 |
-| `DNS_CACHE_SIZE`     | DNS cache size (`65536` by default)                                                   | `5000`                 |
-| `PROXY_LOGIN`        | Authorization login (empty by default)                                                | `username`             |
-| `PROXY_PASSWORD`     | Authorization password (empty by default)                                             | `password`             |
-| `PROXY_PORT`         | **HTTP** proxy port (`3128` by default)                                               | `8080`                 |
-| `SOCKS_PORT`         | **SOCKS** proxy port (`1080` by default)                                              | `8888`                 |
-| `EXTRA_ACCOUNTS`     | Additional proxy users (format `login:password;login2:password2`, empty by default)   | `evil:live;guest:pass` |
-| `EXTRA_CONFIG`       | Raw 3proxy config lines injected before `proxy`/`socks` directives (empty by default) | `# line 1\\n# line 2`  |
+| Variable Name        | Description                                                                           | Example                         |
+|----------------------|---------------------------------------------------------------------------------------|---------------------------------|
+| `LOG_OUTPUT`         | Path for log output (`/dev/stdout` by default; set to `/dev/null` to disable logging) | `/tmp/3proxy.log`               |
+| `PRIMARY_RESOLVER`   | Primary DNS resolver (`1.0.0.1` by default)                                           | `8.8.8.8:5353/tcp`              |
+| `SECONDARY_RESOLVER` | Secondary DNS resolver (`8.8.4.4` by default)                                         | `2001:4860:4860::8844`          |
+| `MAX_CONNECTIONS`    | Maximum number of connections (`512` by default); requires `ulimit nofile` ≥ 2×value  | `2056`                          |
+| `DNS_CACHE_SIZE`     | DNS cache size (`65536` by default)                                                   | `5000`                          |
+| `PROXY_LOGIN`        | Authorization login (empty by default)                                                | `username`                      |
+| `PROXY_PASSWORD`     | Authorization password (empty by default)                                             | `password`                      |
+| `PROXY_PORT`         | **HTTP** proxy port (`3128` by default)                                               | `8080`                          |
+| `SOCKS_PORT`         | **SOCKS** proxy port (`1080` by default)                                              | `8888`                          |
+| `EXTRA_ACCOUNTS`     | Additional proxy users (format `login:password;login2:password2`, empty by default)   | `evil:live;guest:pass`          |
+| `EXTRA_CONFIG`       | Raw 3proxy config lines injected before `proxy`/`socks` directives (empty by default) | `# line 1\\n# line 2`           |
+| `PROXY_EXTRA_ARGS`   | Extra arguments appended to the `proxy` directive (empty by default)                  | `-ocTCP_NODELAY -osTCP_NODELAY` |
+| `SOCKS_EXTRA_ARGS`   | Extra arguments appended to the `socks` directive (empty by default)                  | `-ocTCP_NODELAY -osTCP_NODELAY` |
 
 ## 🚀 Installation
 

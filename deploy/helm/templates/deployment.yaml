@@ -103,6 +103,13 @@ spec:
             - name: EXTRA_CONFIG
               value: {{ .extraConfig | quote }}
             {{- end }}
+
+            {{- if .proxyExtraArgs }}
+            - {name: PROXY_EXTRA_ARGS, value: "{{ .proxyExtraArgs }}"}
+            {{- end }}
+            {{- if .socksExtraArgs }}
+            - {name: SOCKS_EXTRA_ARGS, value: "{{ .socksExtraArgs }}"}
+            {{- end }}
           {{- end }}
           {{- with .Values.deployment.env }}
             {{- tpl (toYaml .) $ | nindent 12 }}

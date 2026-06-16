@@ -169,6 +169,28 @@ helm install the3proxy oci://ghcr.io/tarampampam/3proxy/charts/the3proxy \
   --set 'config.extraConfig=allow * * 10.0.0.0/8\\ndeny *'
 ```
 
+### Extra arguments for proxy/socks directives
+
+Pass additional flags directly to the `proxy` or `socks` directive - for example, to set socket-level
+options that must live on the service line itself and cannot be injected via `extraConfig`:
+
+`values.yaml`:
+
+```yaml
+config:
+  proxyExtraArgs: "-ocTCP_NODELAY -osTCP_NODELAY"
+  socksExtraArgs: "-ocTCP_NODELAY -osTCP_NODELAY"
+```
+
+Via `--set`:
+
+```shell
+helm install the3proxy oci://ghcr.io/tarampampam/3proxy/charts/the3proxy \
+  --version {{ template "chart.version" . }} \
+  --set 'config.proxyExtraArgs=-ocTCP_NODELAY -osTCP_NODELAY' \
+  --set 'config.socksExtraArgs=-ocTCP_NODELAY -osTCP_NODELAY'
+```
+
 ### Disabling logging
 
 Redirect all log output to `/dev/null` to silence the proxy:

@@ -148,3 +148,8 @@ config:
   # -- (string/null) Additional 3proxy configuration lines appended after the main config block but before
   # `proxy`/`socks`/`flush`. Use `\\n` as a line separator when passing via `--set`.
   extraConfig: null
+
+  # -- (string/null) Extra arguments appended to the generated `proxy` directive (e.g. `-ocTCP_NODELAY -osTCP_NODELAY`)
+  proxyExtraArgs: null
+  # -- (string/null) Extra arguments appended to the generated `socks` directive (e.g. `-ocTCP_NODELAY -osTCP_NODELAY`)
+  socksExtraArgs: null
