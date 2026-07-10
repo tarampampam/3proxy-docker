@@ -52,19 +52,14 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
 FROM docker.io/library/alpine:3.24.1 AS the3proxy
 
 # renovate: source=github-tags name=3proxy/3proxy
-ARG THE3PROXY_VERSION=0.9.6
+ARG THE3PROXY_VERSION=0.9.7
 
 # all plugins compiled statically into the binary (no dlopen / .so files at runtime); each plugin can be enabled
 # in 3proxy config with: `plugin <Name> <entry-symbol> [args]`
 # - StringsPlugin - may be used to make the interface more attractive or to translate proxy server messages to a
 #   different language (usage: `plugin StringsPlugin start /etc/3proxy/strings.3ps`)
 #   docs: https://3proxy.org/plugins/StringsPlugin/
-# - PCREPlugin - can be used to create matching and replacement rules with regular expressions for client requests,
-#   client and server headers, and client and server data (usage: `plugin PCREPlugin pcre_plugin` + config commands)
-#   docs: https://3proxy.org/plugins/PCREPlugin/
-# - SSLPlugin - can be used to transparently decrypt SSL/TLS data, provide TLS encryption for proxy traffic, and
-#   authenticate using client certificates (usage: `plugin SSLPlugin ssl_plugin` + config commands)
-#   docs: https://3proxy.org/plugins/SSLPlugin/
+# note: SSLPlugin and PCREPlugin were merged into the main binary in 0.9.7; ssl/pcre code is now always built in
 RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     --mount=type=bind,source=/patches/3proxy,target=/mnt/patches \
     set -x \
@@ -78,7 +73,7 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     && ln -s Makefile.Linux Makefile \
     && echo "" >> ./Makefile \
     && echo "PLUGINS =" >> ./Makefile \
-    && echo "COMPATLIBS += static_plugins.o strings_plugin.o pcre_plugin.o ssl_plugin.o my_ssl.o" >> ./Makefile \
+    && echo "COMPATLIBS += static_plugins.o strings_plugin.o" >> ./Makefile \
     && echo "LIBS = -l:libssl.a -l:libcrypto.a -l:libpcre2-8.a" >> ./Makefile \
     && echo "LDFLAGS += -static" >> ./Makefile \
     && sed -i 's~\(<\/head>\)~<style>:root{--a:#fff;--b:#131313;--c:#232323}@media (prefers-color-scheme: dark){:root{\
@@ -90,15 +85,10 @@ margin-inline:auto}pre{color:var(--c);font-size:.9rem;max-width:80ch;margin-inli
 pre-wrap;word-break:break-word}</style>\1~' ./src/proxy.c \
     && cp /mnt/patches/static_plugins.c ./src/static_plugins.c \
     && gcc -c -fPIC -D_GNU_SOURCE -o ./src/static_plugins.o ./src/static_plugins.c \
-    && for p in StringsPlugin PCREPlugin SSLPlugin; do cp ./Makefile ./src/plugins/$p/Makefile.var; done \
+    && cp ./Makefile ./src/plugins/StringsPlugin/Makefile.var \
     && make -C ./src/plugins/StringsPlugin StringsPlugin.o DCFLAGS="-Dstart=strings_plugin_start" \
-    && make -C ./src/plugins/PCREPlugin pcre_plugin.o \
-    && make -C ./src/plugins/SSLPlugin ssl_plugin.o my_ssl.o \
     && mv ./src/plugins/StringsPlugin/StringsPlugin.o ./src/strings_plugin.o \
-    && mv ./src/plugins/PCREPlugin/pcre_plugin.o ./src/ \
-    && mv ./src/plugins/SSLPlugin/ssl_plugin.o ./src/ \
-    && mv ./src/plugins/SSLPlugin/my_ssl.o ./src/ \
-    && make \
+    && make OPENSSL_CHECK=true PCRE_CHECK=true \
     && strip ./bin/3proxy \
     && if readelf -l ./bin/3proxy | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 66; fi \
     && if readelf -d ./bin/3proxy 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 67; fi \

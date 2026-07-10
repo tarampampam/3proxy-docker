@@ -9,13 +9,9 @@ struct pluginlink;
 typedef int (*pfn)(struct pluginlink *, int, char **);
 
 int strings_plugin_start(struct pluginlink *, int, char **);
-int pcre_plugin(struct pluginlink *, int, char **);
-int ssl_plugin(struct pluginlink *, int, char **);
 
 static const struct { const char *path; const char *sym; pfn fn; } _pl[] = {
-    { "StringsPlugin", "start",      (pfn)strings_plugin_start },
-    { "PCREPlugin",    "pcre_plugin", (pfn)pcre_plugin          },
-    { "SSLPlugin",     "ssl_plugin",  (pfn)ssl_plugin           },
+    { "StringsPlugin", "start", (pfn)strings_plugin_start },
     { NULL, NULL, NULL }
 };
 
