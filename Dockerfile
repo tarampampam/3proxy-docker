@@ -88,7 +88,7 @@ pre-wrap;word-break:break-word}</style>\1~' ./src/proxy.c \
     && cp ./Makefile ./src/plugins/StringsPlugin/Makefile.var \
     && make -C ./src/plugins/StringsPlugin StringsPlugin.o DCFLAGS="-Dstart=strings_plugin_start" \
     && mv ./src/plugins/StringsPlugin/StringsPlugin.o ./src/strings_plugin.o \
-    && make OPENSSL_CHECK=true PCRE_CHECK=true \
+    && make WOLFSSL_CHECK=false OPENSSL_CHECK=true PCRE_CHECK=true \
     && strip ./bin/3proxy \
     && if readelf -l ./bin/3proxy | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 66; fi \
     && if readelf -d ./bin/3proxy 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 67; fi \
