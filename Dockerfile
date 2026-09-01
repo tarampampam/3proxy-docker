@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
 FROM docker.io/library/alpine:3.24.1 AS the3proxy
 
 # renovate: source=github-tags name=3proxy/3proxy
-ARG THE3PROXY_VERSION=0.9.7
+ARG THE3PROXY_VERSION=1.0.0
 
 # all plugins compiled statically into the binary (no dlopen / .so files at runtime); each plugin can be enabled
 # in 3proxy config with: `plugin <Name> <entry-symbol> [args]`
@@ -88,7 +88,7 @@ pre-wrap;word-break:break-word}</style>\1~' ./src/proxy.c \
     && cp ./Makefile ./src/plugins/StringsPlugin/Makefile.var \
     && make -C ./src/plugins/StringsPlugin StringsPlugin.o DCFLAGS="-Dstart=strings_plugin_start" \
     && mv ./src/plugins/StringsPlugin/StringsPlugin.o ./src/strings_plugin.o \
-    && make OPENSSL_CHECK=true PCRE_CHECK=true \
+    && make WOLFSSL_CHECK=false OPENSSL_CHECK=true PCRE_CHECK=true \
     && strip ./bin/3proxy \
     && if readelf -l ./bin/3proxy | grep -q 'INTERP'; then echo "ERR: dynamic loader detected"; exit 66; fi \
     && if readelf -d ./bin/3proxy 2>/dev/null | grep -q 'NEEDED'; then echo "ERR: shared lib deps detected"; exit 67; fi \
