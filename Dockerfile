@@ -4,7 +4,7 @@
 FROM docker.io/library/alpine:3.24.1 AS lua
 
 # renovate: source=github-tags name=lua/lua
-ARG LUA_VERSION=5.5.0
+ARG LUA_VERSION=5.5.1
 
 RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
     --mount=type=bind,source=/patches/lua,target=/mnt/patches\
