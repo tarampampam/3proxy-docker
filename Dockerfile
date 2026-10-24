@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
 FROM docker.io/library/alpine:3.24.2 AS the3proxy
 
 # renovate: source=github-tags name=3proxy/3proxy
-ARG THE3PROXY_VERSION=1.0.1
+ARG THE3PROXY_VERSION=1.0.2
 
 # all plugins compiled statically into the binary (no dlopen / .so files at runtime); each plugin can be enabled
 # in 3proxy config with: `plugin <Name> <entry-symbol> [args]`
